@@ -19,7 +19,7 @@ import {
   SvgIcon,
   Typography,
 } from '@mui/material';
-import { Link, useRouter } from '@tanstack/react-router';
+import { Link, useRouter, useMatchRoute } from '@tanstack/react-router';
 import { useAuth } from '@/context';
 import { Route as LoginRoute } from '@/routes/login.tsx';
 
@@ -89,12 +89,15 @@ type DrawerContentProps = {
 const DrawerContent: React.FC<DrawerContentProps> = ({ onItemClick }) => {
   const router = useRouter();
   const { logout } = useAuth();
+  const matchRoute = useMatchRoute();
   const handleLogout = async () => {
     await logout();
     await router.invalidate();
     await router.navigate(LoginRoute);
   };
-  const selectedRoute = router.state.location.pathname;
+  const isSelectedRoute = (path: string) => {
+    return matchRoute({ to: path, fuzzy: true });
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -111,7 +114,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ onItemClick }) => {
             text={text}
             icon={icon}
             path={path}
-            isSelected={selectedRoute === path}
+            isSelected={isSelectedRoute(path)}
             onClick={onItemClick}
           />
         ))}
