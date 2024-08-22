@@ -10,12 +10,13 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { LoadingAnimation, MembershipPlanDialog } from '@/components';
+import { LoadingAnimation } from '@/components';
 import {
   useDeleteMembershipPlan,
   useMembershipPlans,
   MembershipPlan,
 } from '@/modules/membership-plan';
+import { MembershipPlanDialog } from '@/modules/membership-plan/membership-plan-dialog.tsx';
 
 export function MembershipPlansPage() {
   const theme = useTheme();
