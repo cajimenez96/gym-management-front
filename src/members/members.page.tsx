@@ -11,20 +11,14 @@ import {
   IconButton,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Member, MemberStatus, UpdateMemberData } from '@/members';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useMemo } from 'react';
 import { useDeleteMember, useGetMembers, useUpdateMember } from '@/ui/hooks';
 import { LoadingAnimation } from '@/ui/components';
 
@@ -61,64 +55,69 @@ export function MembersPage() {
       status: formData.get('status') as MemberStatus,
     };
     updateMember({ id: editingMember.id, data: memberData });
+    handleEditClose();
   };
+
+  const columns: GridColDef[] = useMemo(
+    () => [
+      { field: 'id', headerName: 'ID', width: 70 },
+      {
+        field: 'name',
+        headerName: 'Name',
+        width: 180,
+        renderCell: (params) => {
+          return `${params.row.firstName || ''} ${params.row.lastName || ''}`;
+        },
+      },
+      { field: 'email', headerName: 'Email', width: 200 },
+      { field: 'phone', headerName: 'Phone', width: 150 },
+      { field: 'status', headerName: 'Status', width: 120 },
+      {
+        field: 'actions',
+        headerName: 'Actions',
+        width: 120,
+        sortable: false,
+        renderCell: (params) => (
+          <>
+            <Tooltip title="Edit">
+              <IconButton
+                onClick={() => handleEditClick(params.row)}
+                size="small"
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                onClick={() => handleDeleteClick(params.row.id)}
+                size="small"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        ),
+      },
+    ],
+    [],
+  );
 
   if (isLoading) {
     return <LoadingAnimation />;
   }
 
   if (isError) {
-    return <Typography color="red">An error occurred</Typography>;
+    return <Typography color="error">An error occurred</Typography>;
   }
 
   return (
-    <Container maxWidth={'lg'}>
+    <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           All Members
         </Typography>
       </Box>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="members table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="center">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {members.map((member) => (
-              <TableRow key={member.id} hover>
-                <TableCell>{`${member.firstName} ${member.lastName}`}</TableCell>
-                <TableCell>{member.email}</TableCell>
-                <TableCell>{member.phone}</TableCell>
-                <TableCell>{member.status}</TableCell>
-                <TableCell align="center">
-                  <Tooltip title="Edit">
-                    <IconButton
-                      onClick={() => handleEditClick(member)}
-                      size="small"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton
-                      onClick={() => handleDeleteClick(member.id)}
-                      size="small"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <DataGrid rows={members} columns={columns} autoHeight />
 
       <Dialog open={!!editingMember} onClose={handleEditClose}>
         <DialogTitle>Edit Member</DialogTitle>
