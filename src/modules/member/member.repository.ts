@@ -1,5 +1,5 @@
 import { MEMBERS_URL, apiClient } from '@/api-client.ts';
-import { CreateMemberData, Member, UpdateMemberData } from 'src/member';
+import { CreateMemberData, Member, UpdateMemberData } from '@/modules/member';
 import { AxiosInstance } from 'axios';
 
 export class MemberRepository {

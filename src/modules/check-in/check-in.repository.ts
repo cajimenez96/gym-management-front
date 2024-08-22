@@ -1,5 +1,5 @@
 import { CHECK_INS_URL } from '@/api-client.ts';
-import { CheckIn } from '@/check-in';
+import { CheckIn } from '@/modules/check-in';
 import { AxiosInstance } from 'axios';
 
 export class CheckInRepository {

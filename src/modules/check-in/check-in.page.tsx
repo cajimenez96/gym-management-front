@@ -19,10 +19,10 @@ import {
   Paper,
   TablePagination,
 } from '@mui/material';
-import { useCheckInPage } from './use-check-in-page';
+import { useCheckInPage } from './use-check-in-page.ts';
 import { LoadingAnimation } from '@/components';
-import { CheckIn } from '@/check-in';
-import { Member } from '@/member';
+import { CheckIn } from '@/modules/check-in';
+import { Member } from '@/modules/member';
 import { format, parseISO } from 'date-fns';
 
 const MemberSelect: React.FC<{

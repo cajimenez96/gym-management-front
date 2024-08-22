@@ -3,7 +3,7 @@ import {
   MembershipPlan,
   UpdateMembershipPlanData,
   MembershipPlanRepository,
-} from '@/membership-plan';
+} from '@/modules/membership-plan';
 
 export class MembershipPlanService {
   private membershipPlanRepository: MembershipPlanRepository;

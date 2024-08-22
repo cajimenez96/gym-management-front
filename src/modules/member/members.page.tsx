@@ -24,7 +24,7 @@ import {
   useDeleteMember,
   useGetMembers,
   useUpdateMember,
-} from '@/member';
+} from '@/modules/member';
 import { FormEvent, useState, useMemo } from 'react';
 import { LoadingAnimation } from '@/components';
 

@@ -2,7 +2,7 @@ import {
   CheckInRepository,
   CheckInServiceImpl,
   CheckIn,
-} from '@/check-in/index.ts';
+} from '@/modules/check-in/index.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api-client.ts';
 

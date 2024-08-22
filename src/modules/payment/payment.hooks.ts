@@ -6,7 +6,7 @@ import {
   PaymentWithMember,
   PaymentService,
   PaymentRepository,
-} from '@/payment';
+} from '@/modules/payment';
 
 const paymentRepository = new PaymentRepository(apiClient);
 const paymentService = new PaymentService(paymentRepository);

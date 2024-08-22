@@ -10,7 +10,7 @@ import {
   MembershipPlan,
   useCreateMembershipPlan,
   useUpdateMembershipPlan,
-} from '@/membership-plan';
+} from '@/modules/membership-plan';
 import React, { useState } from 'react';
 
 interface MembershipPlanDialogProps {

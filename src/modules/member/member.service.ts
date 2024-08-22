@@ -4,7 +4,7 @@ import {
   MemberStatus,
   UpdateMemberData,
   MemberRepository,
-} from '@/member';
+} from '@/modules/member';
 
 export class MemberService {
   private memberRepository: MemberRepository;

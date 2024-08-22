@@ -1,5 +1,5 @@
 import { Box, Button, TextField } from '@mui/material';
-import { CreateMemberData, useRegisterMember } from '@/member';
+import { CreateMemberData, useRegisterMember } from '@/modules/member';
 import React from 'react';
 
 export function RegisterMemberForm() {

@@ -1,4 +1,4 @@
-import { CheckIn, CheckInRepository } from '@/check-in';
+import { CheckIn, CheckInRepository } from '@/modules/check-in';
 
 export class CheckInServiceImpl {
   private checkInRepository: CheckInRepository;

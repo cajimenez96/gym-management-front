@@ -3,7 +3,7 @@ import {
   CreateMembershipPlanData,
   MembershipPlan,
   UpdateMembershipPlanData,
-} from '@/membership-plan';
+} from '@/modules/membership-plan';
 import { AxiosInstance } from 'axios';
 
 export class MembershipPlanRepository {

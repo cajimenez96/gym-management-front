@@ -1,4 +1,8 @@
-import { Payment, PaymentWithMember, PaymentRepository } from '@/payment';
+import {
+  Payment,
+  PaymentWithMember,
+  PaymentRepository,
+} from '@/modules/payment';
 
 export class PaymentService {
   private paymentRepository: PaymentRepository;
