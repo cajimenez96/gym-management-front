@@ -94,6 +94,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ onItemClick }) => {
     await router.invalidate();
     await router.navigate(LoginRoute);
   };
+  const selectedRoute = router.state.location.pathname;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -110,7 +111,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ onItemClick }) => {
             text={text}
             icon={icon}
             path={path}
-            isSelected={router.state.location.pathname === path}
+            isSelected={selectedRoute === path}
             onClick={onItemClick}
           />
         ))}
