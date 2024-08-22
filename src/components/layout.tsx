@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import {
   Box,
   CssBaseline,
@@ -7,6 +7,7 @@ import {
   AppBar,
   Toolbar,
   IconButton,
+  Typography,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Sidenav } from '@/components/index.ts';
@@ -35,6 +36,9 @@ export function Layout({ children }: { children: ReactNode }) {
             >
               <MenuIcon />
             </IconButton>
+            <Typography variant="h6" component="div">
+              Gym Management
+            </Typography>
           </Toolbar>
         </AppBar>
       ) : null}
