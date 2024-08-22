@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/ui/hooks';
+import { useSnackbar } from '@/context';
 import { apiClient } from '@/api-client.ts';
 import {
   Payment,

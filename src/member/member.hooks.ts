@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/ui/context';
+import { useSnackbar } from '@/context';
 import {
   CreateMemberData,
   Member,
   UpdateMemberData,
   MemberRepository,
   MemberService,
-} from 'src/member';
+} from '@/member';
 
 const memberRepository = new MemberRepository();
 const memberService = new MemberService(memberRepository);

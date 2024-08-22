@@ -17,10 +17,16 @@ import {
   Typography,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Member, MemberStatus, UpdateMemberData } from 'src/member';
+import {
+  Member,
+  MemberStatus,
+  UpdateMemberData,
+  useDeleteMember,
+  useGetMembers,
+  useUpdateMember,
+} from '@/member';
 import { FormEvent, useState, useMemo } from 'react';
-import { useDeleteMember, useGetMembers, useUpdateMember } from '@/ui/hooks';
-import { LoadingAnimation } from '@/ui/components';
+import { LoadingAnimation } from '@/components';
 
 export function MembersPage() {
   const [editingMember, setEditingMember] = useState<Member | null>(null);

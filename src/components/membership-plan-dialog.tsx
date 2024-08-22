@@ -6,8 +6,11 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import { useCreateMembershipPlan, useUpdateMembershipPlan } from '@/ui/hooks';
-import { MembershipPlan } from '@/core/entities';
+import {
+  MembershipPlan,
+  useCreateMembershipPlan,
+  useUpdateMembershipPlan,
+} from '@/membership-plan';
 import React, { useState } from 'react';
 
 interface MembershipPlanDialogProps {

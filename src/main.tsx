@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { routeTree } from './routeTree.gen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider, SnackbarProvider, useAuth } from '@/ui/context';
+import { AuthProvider, SnackbarProvider, useAuth } from '@/context';
 import { createTheme, ThemeProvider } from '@mui/material';
 
 export const queryClient = new QueryClient();

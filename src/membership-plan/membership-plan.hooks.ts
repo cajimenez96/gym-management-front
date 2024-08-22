@@ -4,9 +4,9 @@ import {
   CreateMembershipPlanData,
   UpdateMembershipPlanData,
   MembershipPlanService,
-} from '@/membership-plan';
+} from '@/membership-plan/index.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/ui/hooks';
+import { useSnackbar } from '@/context';
 
 const membershipPlanRepository = new MembershipPlanRepository();
 const membershipPlanService = new MembershipPlanService(

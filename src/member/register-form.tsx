@@ -1,7 +1,6 @@
 import { Box, Button, TextField } from '@mui/material';
-import { CreateMemberData } from '@/core/entities';
+import { CreateMemberData, useRegisterMember } from '@/member';
 import React from 'react';
-import { useRegisterMember } from '@/ui/hooks';
 
 export function RegisterMemberForm() {
   const { mutateAsync: registerMember, isPending } = useRegisterMember();

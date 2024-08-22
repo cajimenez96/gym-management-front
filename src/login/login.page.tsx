@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useAuth } from '@/ui/hooks';
+import { useAuth } from '@/context';
 import { useNavigate, useRouter, useSearch } from '@tanstack/react-router';
 import { sleep } from '@/utils.ts';
 

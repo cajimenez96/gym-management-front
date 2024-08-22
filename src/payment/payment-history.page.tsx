@@ -1,7 +1,7 @@
 import { Box, Container, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { usePaymentsWithMembers } from '@/ui/hooks'; // Adjust the import path as needed
-import { LoadingAnimation } from '@/ui/components'; // Adjust the import path as needed
+import { usePaymentsWithMembers } from '@/payment'; // Adjust the import path as needed
+import { LoadingAnimation } from '@/components'; // Adjust the import path as needed
 
 const columns: GridColDef[] = [
   {

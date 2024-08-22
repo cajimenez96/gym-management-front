@@ -20,7 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Link, useRouter } from '@tanstack/react-router';
-import { useAuth } from '@/ui/hooks';
+import { useAuth } from '@/context';
 import { Route as LoginRoute } from '@/routes/login.tsx';
 
 const DRAWER_WIDTH = 240;

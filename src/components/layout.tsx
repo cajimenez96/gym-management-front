@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Box, CssBaseline, useMediaQuery, useTheme } from '@mui/material';
-import { Sidenav } from '@/ui/components';
+import { Sidenav } from '@/components/index.ts';
 
 export function Layout({ children }: { children: ReactNode }) {
   const theme = useTheme();

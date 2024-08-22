@@ -20,8 +20,9 @@ import {
   TablePagination,
 } from '@mui/material';
 import { useCheckInPage } from './use-check-in-page';
-import { LoadingAnimation } from '@/ui/components';
-import { CheckIn, Member } from '@/core/entities';
+import { LoadingAnimation } from '@/components';
+import { CheckIn } from '@/check-in';
+import { Member } from '@/member';
 import { format, parseISO } from 'date-fns';
 
 const MemberSelect: React.FC<{
