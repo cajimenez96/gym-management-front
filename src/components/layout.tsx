@@ -1,5 +1,14 @@
 import { ReactNode, useState } from 'react';
-import { Box, CssBaseline, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  CssBaseline,
+  useMediaQuery,
+  useTheme,
+  AppBar,
+  Toolbar,
+  IconButton,
+} from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 import { Sidenav } from '@/components/index.ts';
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -13,6 +22,22 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <CssBaseline />
+      {isMobile ? (
+        <AppBar position="fixed">
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      ) : null}
       <Sidenav
         isMobile={isMobile}
         mobileOpen={mobileOpen}
@@ -27,9 +52,9 @@ export function Layout({ children }: { children: ReactNode }) {
           height: '100vh',
           overflow: 'auto',
           width: '100%',
+          mt: isMobile ? '64px' : 0, // Add top margin for mobile to account for AppBar height
         }}
       >
-        <CssBaseline />
         {children}
       </Box>
     </Box>

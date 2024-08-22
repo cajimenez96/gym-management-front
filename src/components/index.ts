@@ -1,3 +1,3 @@
 export * from './loading-animation.tsx';
-export * from './sidenav/sidenav.tsx';
+export * from '@/components/nav/sidenav.tsx';
 export * from './layout.tsx';

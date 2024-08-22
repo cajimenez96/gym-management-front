@@ -31,7 +31,7 @@ type MenuItem = {
   path: string;
 };
 
-const MENU_ITEMS: MenuItem[] = [
+export const MENU_ITEMS: MenuItem[] = [
   { text: 'Register Member', icon: PersonAddIcon, path: '/register' },
   { text: 'Member List', icon: PeopleIcon, path: '/members' },
   { text: 'Process Payment', icon: PaymentIcon, path: '/payment' },
@@ -142,32 +142,32 @@ export function Sidenav({ isMobile, mobileOpen, onClose }: SidenavProps) {
     },
   };
 
-  if (!isMobile) {
+  if (isMobile) {
     return (
       <Drawer
-        variant="permanent"
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onClose}
+        ModalProps={{ keepMounted: true }}
         sx={{
           ...drawerProps.sx,
-          display: { xs: 'none', sm: 'block' },
+          display: { xs: 'block', sm: 'none' },
         }}
       >
-        <DrawerContent />
+        <DrawerContent onItemClick={onClose} />
       </Drawer>
     );
   }
 
   return (
     <Drawer
-      variant="temporary"
-      open={mobileOpen}
-      onClose={onClose}
-      ModalProps={{ keepMounted: true }}
+      variant="permanent"
       sx={{
         ...drawerProps.sx,
-        display: { xs: 'block', sm: 'none' },
+        display: { xs: 'none', sm: 'block' },
       }}
     >
-      <DrawerContent onItemClick={onClose} />
+      <DrawerContent />
     </Drawer>
   );
 }
