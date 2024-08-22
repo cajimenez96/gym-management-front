@@ -9,13 +9,16 @@ const memberService = new MemberServiceImpl(memberRepository);
 
 export const useRegisterMember = () => {
   const queryClient = useQueryClient();
+  const { showSnackbar } = useSnackbar();
 
   return useMutation<Member, Error, CreateMemberData>({
     mutationFn: (data: CreateMemberData) => memberService.createMember(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['members'] });
+      showSnackbar('Member registered successfully!', 'success');
     },
     onError: (error) => {
+      showSnackbar('Failed to register member.', 'error');
       console.error('Error registering member:', error);
     },
   });
