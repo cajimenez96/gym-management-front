@@ -34,10 +34,7 @@ export const SnackbarProvider: React.FC<SnackbarProviderProps> = ({
     setOpen(true);
   };
 
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
+  const handleClose = (_?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
