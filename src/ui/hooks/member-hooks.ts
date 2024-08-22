@@ -1,11 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/ui/context';
-import { CreateMemberData, Member, UpdateMemberData } from '@/core/entities';
-import { ApiMemberRepository } from '@/core/repositories';
-import { MemberServiceImpl } from '@/core/services';
+import {
+  CreateMemberData,
+  Member,
+  UpdateMemberData,
+  MemberRepository,
+  MemberService,
+} from '@/members';
 
-const memberRepository = new ApiMemberRepository();
-const memberService = new MemberServiceImpl(memberRepository);
+const memberRepository = new MemberRepository();
+const memberService = new MemberService(memberRepository);
 
 export const useRegisterMember = () => {
   const queryClient = useQueryClient();

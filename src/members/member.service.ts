@@ -3,15 +3,13 @@ import {
   Member,
   MemberStatus,
   UpdateMemberData,
-} from '@/core/entities';
-import { ApiMemberRepository } from '@/core/repositories';
+  MemberRepository,
+} from '@/members';
 
-export class MemberServiceImpl {
-  private memberRepository: ApiMemberRepository;
+export class MemberService {
+  private memberRepository: MemberRepository;
 
-  constructor(
-    memberRepository: ApiMemberRepository = new ApiMemberRepository(),
-  ) {
+  constructor(memberRepository: MemberRepository = new MemberRepository()) {
     this.memberRepository = memberRepository;
   }
 

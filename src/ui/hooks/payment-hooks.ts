@@ -1,12 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/ui/hooks';
-import { apiClient } from '@/core/api-client';
-import { Payment, PaymentWithMember } from '@/core/entities';
-import { ApiPaymentRepository } from '@/core/repositories';
-import { PaymentServiceImpl } from '@/core/services';
+import { apiClient } from '@/api-client.ts';
+import {
+  Payment,
+  PaymentWithMember,
+  PaymentService,
+  PaymentRepository,
+} from '@/payment';
 
-const paymentRepository = new ApiPaymentRepository(apiClient);
-const paymentService = new PaymentServiceImpl(paymentRepository);
+const paymentRepository = new PaymentRepository(apiClient);
+const paymentService = new PaymentService(paymentRepository);
 
 export const useInitiatePayment = (
   onSuccess: (data: { clientSecret: string; paymentIntentId: string }) => void,

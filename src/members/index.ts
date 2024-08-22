@@ -1,2 +1,4 @@
 export * from './members.page.tsx';
-export * from './member.entity.ts';
+export * from './member.model.ts';
+export * from './member.repository';
+export * from './member.service';

@@ -1,10 +1,9 @@
-import { Payment, PaymentWithMember } from '@/core/entities';
-import { ApiPaymentRepository } from '@/core/repositories';
+import { Payment, PaymentWithMember, PaymentRepository } from '@/payment';
 
-export class PaymentServiceImpl {
-  private paymentRepository: ApiPaymentRepository;
+export class PaymentService {
+  private paymentRepository: PaymentRepository;
 
-  constructor(paymentRepository: ApiPaymentRepository) {
+  constructor(paymentRepository: PaymentRepository) {
     this.paymentRepository = paymentRepository;
   }
 

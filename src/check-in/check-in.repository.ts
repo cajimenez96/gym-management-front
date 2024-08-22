@@ -1,8 +1,8 @@
-import { CHECK_INS_URL } from '@/core/api-client';
-import { CheckIn } from '@/core/entities';
+import { CHECK_INS_URL } from '@/api-client.ts';
+import { CheckIn } from '@/check-in';
 import { AxiosInstance } from 'axios';
 
-export class ApiCheckInRepository {
+export class CheckInRepository {
   constructor(private apiClient: AxiosInstance) {}
 
   async createCheckIn(memberId: string): Promise<CheckIn> {
