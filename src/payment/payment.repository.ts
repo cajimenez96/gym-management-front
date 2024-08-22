@@ -1,7 +1,7 @@
 import { MEMBERS_URL, PAYMENTS_URL } from '@/api-client.ts';
 import { AxiosInstance } from 'axios';
 import { Payment, PaymentWithMember } from '@/payment';
-import { Member } from '@/members';
+import { Member } from 'src/member';
 
 export class PaymentRepository {
   constructor(private apiClient: AxiosInstance) {}

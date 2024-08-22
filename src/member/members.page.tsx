@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Member, MemberStatus, UpdateMemberData } from '@/members';
+import { Member, MemberStatus, UpdateMemberData } from 'src/member';
 import { FormEvent, useState, useMemo } from 'react';
 import { useDeleteMember, useGetMembers, useUpdateMember } from '@/ui/hooks';
 import { LoadingAnimation } from '@/ui/components';

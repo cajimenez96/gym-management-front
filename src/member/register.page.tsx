@@ -1,5 +1,5 @@
 import { Container, Paper, Typography } from '@mui/material';
-import { RegisterMemberForm } from '@/register/register-form.tsx';
+import { RegisterMemberForm } from '@/member/register-form.tsx';
 
 export function RegisterPage() {
   return (

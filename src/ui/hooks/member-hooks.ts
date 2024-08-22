@@ -6,7 +6,7 @@ import {
   UpdateMemberData,
   MemberRepository,
   MemberService,
-} from '@/members';
+} from 'src/member';
 
 const memberRepository = new MemberRepository();
 const memberService = new MemberService(memberRepository);

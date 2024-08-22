@@ -4,7 +4,7 @@ import {
   MemberStatus,
   UpdateMemberData,
   MemberRepository,
-} from '@/members';
+} from 'src/member';
 
 export class MemberService {
   private memberRepository: MemberRepository;
