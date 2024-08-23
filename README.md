@@ -3,6 +3,9 @@
 A modern, responsive web application for efficient gym management. This frontend project provides an intuitive interface
 for gym owners and administrators to manage members, memberships, payments, and check-ins.
 
+Integrates seamlessly with
+the [backend application](https://github.com/HanifCarroll/gym-management-server-express).
+
 ## Table of Contents
 
 1. [Features](#features)
@@ -28,6 +31,7 @@ for gym owners and administrators to manage members, memberships, payments, and 
 ## Technologies Used
 
 - TypeScript
+- Vite
 - React 18
 - Tanstack Router
 - Material-UI (MUI) for UI components
