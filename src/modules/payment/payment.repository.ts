@@ -1,10 +1,14 @@
-import { MEMBERS_URL, PAYMENTS_URL } from '@/api-client.ts';
+import { MEMBERS_URL, PAYMENTS_URL, apiClient } from '@/api-client.ts';
 import { AxiosInstance } from 'axios';
 import { Payment, PaymentWithMember } from '@/modules/payment';
 import { Member } from '@/modules/member';
 
 export class PaymentRepository {
-  constructor(private apiClient: AxiosInstance) {}
+  private readonly apiClient: AxiosInstance;
+
+  constructor() {
+    this.apiClient = apiClient;
+  }
 
   async initiatePayment({
     amount,

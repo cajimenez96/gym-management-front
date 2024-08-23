@@ -7,10 +7,10 @@ import {
 import { AxiosInstance } from 'axios';
 
 export class MembershipPlanRepository {
-  private apiClient: AxiosInstance;
+  private readonly apiClient: AxiosInstance;
 
-  constructor(apiClientInstance: AxiosInstance = apiClient) {
-    this.apiClient = apiClientInstance;
+  constructor() {
+    this.apiClient = apiClient;
   }
 
   async getAll(): Promise<MembershipPlan[]> {

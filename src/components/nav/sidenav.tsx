@@ -69,24 +69,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   </ListItemButton>
 );
 
-type LogoutButtonProps = {
-  onClick: () => void;
-};
-
-const LogoutButton: React.FC<LogoutButtonProps> = ({ onClick }) => (
-  <ListItemButton onClick={onClick}>
-    <ListItemIcon>
-      <LogoutIcon />
-    </ListItemIcon>
-    <ListItemText primary="Logout" />
-  </ListItemButton>
-);
-
-type DrawerContentProps = {
-  onItemClick?: () => void;
-};
-
-const DrawerContent: React.FC<DrawerContentProps> = ({ onItemClick }) => {
+function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
   const router = useRouter();
   const { logout } = useAuth();
   const matchRoute = useMatchRoute();
@@ -121,11 +104,16 @@ const DrawerContent: React.FC<DrawerContentProps> = ({ onItemClick }) => {
       </List>
       <Box sx={{ mt: 'auto' }}>
         <Divider />
-        <LogoutButton onClick={handleLogout} />
+        <ListItemButton onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItemButton>
       </Box>
     </Box>
   );
-};
+}
 
 type SidenavProps = {
   isMobile: boolean;

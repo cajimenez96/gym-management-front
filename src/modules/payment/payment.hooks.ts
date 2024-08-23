@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/context';
-import { apiClient } from '@/api-client.ts';
 import {
   Payment,
   PaymentWithMember,
@@ -8,8 +7,16 @@ import {
   PaymentRepository,
 } from '@/modules/payment';
 
-const paymentRepository = new PaymentRepository(apiClient);
-const paymentService = new PaymentService(paymentRepository);
+// Not sure why, but one day I started getting an error about using paymentRepository
+// before it was initialized, and this solved the issue.
+let paymentService: PaymentService | null = null;
+const getPaymentService = () => {
+  if (!paymentService) {
+    const paymentRepository = new PaymentRepository();
+    paymentService = new PaymentService(paymentRepository);
+  }
+  return paymentService;
+};
 
 export const useInitiatePayment = (
   onSuccess: (data: { clientSecret: string; paymentIntentId: string }) => void,
@@ -22,7 +29,7 @@ export const useInitiatePayment = (
     { amount: number; memberId: string; planId: string }
   >({
     mutationFn: ({ amount, memberId, planId }) =>
-      paymentService.initiatePayment({ amount, memberId, planId }),
+      getPaymentService().initiatePayment({ amount, memberId, planId }),
     onSuccess: (data) => {
       onSuccess(data);
     },
@@ -39,7 +46,7 @@ export const useConfirmPayment = () => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (paymentIntentId: string) =>
-      paymentService.confirmPayment(paymentIntentId),
+      getPaymentService().confirmPayment(paymentIntentId),
     onSuccess: async () => {
       showSnackbar('Payment successful!', 'success');
       await queryClient.invalidateQueries({ queryKey: ['paymentHistory'] });
@@ -57,13 +64,13 @@ export const useConfirmPayment = () => {
 export const usePaymentHistory = () => {
   return useQuery<Payment[], Error>({
     queryKey: ['paymentHistory'],
-    queryFn: () => paymentService.getPaymentHistory(),
+    queryFn: () => getPaymentService().getPaymentHistory(),
   });
 };
 
 export const usePaymentsWithMembers = () => {
   return useQuery<PaymentWithMember[], Error>({
     queryKey: ['paymentsWithMembers'],
-    queryFn: () => paymentService.getPaymentsWithMembers(),
+    queryFn: () => getPaymentService().getPaymentsWithMembers(),
   });
 };

@@ -4,9 +4,8 @@ import {
   CheckIn,
 } from '@/modules/check-in/index.ts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api-client.ts';
 
-const checkInRepository = new CheckInRepository(apiClient);
+const checkInRepository = new CheckInRepository();
 const checkInService = new CheckInServiceImpl(checkInRepository);
 
 export const useGetCheckIns = () => {

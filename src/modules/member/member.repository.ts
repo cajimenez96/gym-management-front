@@ -3,7 +3,7 @@ import { CreateMemberData, Member, UpdateMemberData } from '@/modules/member';
 import { AxiosInstance } from 'axios';
 
 export class MemberRepository {
-  apiClient: AxiosInstance;
+  private readonly apiClient: AxiosInstance;
 
   constructor() {
     this.apiClient = apiClient;
