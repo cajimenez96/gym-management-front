@@ -3,14 +3,13 @@ import {
   Box,
   Button,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   SelectChangeEvent,
   Typography,
   useMediaQuery,
   useTheme,
   Paper,
+  Autocomplete,
+  TextField,
 } from '@mui/material';
 import { useCheckInPage } from './use-check-in-page.ts';
 import { LoadingAnimation } from '@/components';
@@ -19,29 +18,39 @@ import { Member } from '@/modules/member';
 import { format, parseISO } from 'date-fns';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
-const MemberSelect: React.FC<{
+interface SearchableMemberSelectProps {
   selectedMemberId: string;
-  onMemberChange: (event: SelectChangeEvent) => void;
+  onMemberChange: (memberId: string) => void;
   members: Member[];
-}> = ({ selectedMemberId, onMemberChange, members }) => (
-  <FormControl fullWidth sx={{ mr: 1 }}>
-    <InputLabel id="member-select-label">Select Member</InputLabel>
-    <Select
-      labelId="member-select-label"
-      id="member-select"
-      value={selectedMemberId}
-      label="Select Member"
-      onChange={onMemberChange}
-      variant="outlined"
-    >
-      {members.map((member) => (
-        <MenuItem key={member.id} value={member.id}>
-          {`${member.firstName} ${member.lastName}`}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-);
+}
+
+export const SearchableMemberSelect: React.FC<SearchableMemberSelectProps> = ({
+  selectedMemberId,
+  onMemberChange,
+  members,
+}) => {
+  const handleChange = (_: React.SyntheticEvent, value: Member | null) => {
+    if (value) {
+      onMemberChange(value.id);
+    }
+  };
+
+  return (
+    <FormControl fullWidth>
+      <Autocomplete
+        id="member-select-autocomplete"
+        options={members}
+        getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+        renderInput={(params) => (
+          <TextField {...params} label="Select Member" />
+        )}
+        value={members.find((member) => member.id === selectedMemberId) || null}
+        onChange={handleChange}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+      />
+    </FormControl>
+  );
+};
 
 function CheckInTable({
   checkIns,
@@ -135,9 +144,13 @@ export function CheckInPage() {
         Gym Check-In System
       </Typography>
       <Box sx={{ mb: 2 }}>
-        <MemberSelect
+        <SearchableMemberSelect
           selectedMemberId={selectedMemberId}
-          onMemberChange={handleMemberChange}
+          onMemberChange={(memberId) =>
+            handleMemberChange({
+              target: { value: memberId },
+            } as SelectChangeEvent)
+          }
           members={members}
         />
         <Button
