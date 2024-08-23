@@ -68,12 +68,14 @@ export function MembersPage() {
     () => [
       { field: 'id', headerName: 'ID', width: 70 },
       {
-        field: 'name',
-        headerName: 'Name',
+        field: 'firstName',
+        headerName: 'First Name',
+        width: 130,
+      },
+      {
+        field: 'lastName',
+        headerName: 'Last Name',
         width: 180,
-        renderCell: (params) => {
-          return `${params.row.firstName || ''} ${params.row.lastName || ''}`;
-        },
       },
       { field: 'email', headerName: 'Email', width: 200 },
       { field: 'phone', headerName: 'Phone', width: 150 },
