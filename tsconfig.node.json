@@ -7,7 +7,9 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "vitest/globals",
+      "@testing-library/jest-dom"
     ],
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -22,6 +24,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "vite.config.ts"
+    "vite.config.ts",
+    "vitest.setup.ts"
   ]
 }

@@ -29,6 +29,12 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "src",
+    "vite.config.ts",
+    "vitest.setup.ts"
+  ],
+  "types": [
+    "vitest/globals",
+    "@testing-library/jest-dom"
   ]
 }
