@@ -30,6 +30,28 @@ export class PaymentService {
     await this.paymentRepository.confirmPayment(paymentIntentId);
   }
 
+  async createManualPayment({
+    memberId,
+    planId,
+    amount,
+    paymentMethod,
+    notes,
+  }: {
+    memberId: string;
+    planId: string;
+    amount: number;
+    paymentMethod: string;
+    notes?: string;
+  }): Promise<Payment> {
+    return this.paymentRepository.createManualPayment({
+      memberId,
+      planId,
+      amount,
+      paymentMethod,
+      notes,
+    });
+  }
+
   async getPaymentHistory(): Promise<Payment[]> {
     return this.paymentRepository.getPaymentHistory();
   }

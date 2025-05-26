@@ -33,6 +33,29 @@ export class PaymentRepository {
     await this.apiClient.post(`${PAYMENTS_URL}/confirm/${paymentIntentId}`);
   }
 
+  async createManualPayment({
+    memberId,
+    planId,
+    amount,
+    paymentMethod,
+    notes,
+  }: {
+    memberId: string;
+    planId: string;
+    amount: number;
+    paymentMethod: string;
+    notes?: string;
+  }): Promise<Payment> {
+    const response = await this.apiClient.post<Payment>(`${PAYMENTS_URL}/manual`, {
+      memberId,
+      planId,
+      amount,
+      paymentMethod,
+      notes,
+    });
+    return response.data;
+  }
+
   async getPaymentHistory(): Promise<Payment[]> {
     const response = await this.apiClient.get<Payment[]>(`${PAYMENTS_URL}`);
     return response.data;

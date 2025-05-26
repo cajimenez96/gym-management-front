@@ -53,10 +53,34 @@ export const useConfirmPayment = () => {
     },
     onError: (error) => {
       showSnackbar(
-        'Payment confirmed on Stripe but failed to update our records. Please contact support.',
+        'Payment confirmed but failed to update our records. Please contact support.',
         'error',
       );
       console.error('Error confirming payment:', error);
+    },
+  });
+};
+
+export const useCreateManualPayment = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    Payment,
+    Error,
+    {
+      memberId: string;
+      planId: string;
+      amount: number;
+      paymentMethod: string;
+      notes?: string;
+    }
+  >({
+    mutationFn: (data) => getPaymentService().createManualPayment(data),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['paymentHistory'] });
+      await queryClient.invalidateQueries({ queryKey: ['paymentsWithMembers'] });
+    },
+    onError: (error) => {
+      console.error('Error creating manual payment:', error);
     },
   });
 };

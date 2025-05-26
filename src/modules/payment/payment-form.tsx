@@ -1,15 +1,10 @@
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import React, { useState } from 'react';
 import { useSnackbar } from '@/context';
 import { useGetMembers } from '@/modules/member';
 import { useMembershipPlans } from '@/modules/membership-plan';
-import {
-  useConfirmPayment,
-  useInitiatePayment,
-} from '@/modules/payment/payment.hooks.ts';
+import { useCreateManualPayment } from '@/modules/payment/payment.hooks.ts';
 import { LoadingAnimation } from '@/components';
 import {
-  Box,
   Button,
   CircularProgress,
   FormControl,
@@ -22,13 +17,14 @@ import {
 } from '@mui/material';
 
 export function PaymentForm() {
-  const stripe = useStripe();
-  const elements = useElements();
   const [memberId, setMemberId] = useState('');
   const [planId, setPlanId] = useState('');
   const [planPrice, setPlanPrice] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [notes, setNotes] = useState('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const { showSnackbar } = useSnackbar();
+  
   const {
     data: members = [],
     isLoading: isMembersLoading,
@@ -43,55 +39,48 @@ export function PaymentForm() {
   const isLoading = isMembersLoading || isPlansLoading;
   const isError = isMembersError || isPlansError;
   const submitPaymentButtonDisabled =
-    isProcessingPayment || isMembersLoading || !memberId || !planId;
-  const confirmPaymentMutation = useConfirmPayment();
-  const initiatePaymentMutation = useInitiatePayment(
-    async (data) => {
-      if (!stripe || !elements) {
-        throw new Error('Stripe has not loaded');
-      }
+    isProcessingPayment || isMembersLoading || !memberId || !planId || !paymentMethod;
 
-      const result = await stripe.confirmCardPayment(data.clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement)!,
-        },
-      });
-
-      if (result?.error) {
-        showSnackbar(result.error.message || 'Payment failed', 'error');
-        setIsProcessingPayment(false);
-      } else if (result?.paymentIntent.status === 'succeeded') {
-        confirmPaymentMutation.mutate(data.paymentIntentId, {
-          onSuccess: () => {
-            setMemberId('');
-            setPlanId('');
-            elements?.getElement(CardElement)?.clear();
-          },
-          onSettled: () => setIsProcessingPayment(false),
-        });
-      }
-    },
-    () => setIsProcessingPayment(false),
-  );
+  const createPaymentMutation = useCreateManualPayment();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
-    if (!stripe || !elements) {
-      showSnackbar('Stripe has not loaded', 'error');
-      return;
-    }
 
     if (!memberId) {
       showSnackbar('Please select a Member', 'error');
       return;
     }
 
+    if (!planId) {
+      showSnackbar('Please select a Plan', 'error');
+      return;
+    }
+
+    if (!paymentMethod) {
+      showSnackbar('Please select a Payment Method', 'error');
+      return;
+    }
+
     setIsProcessingPayment(true);
-    initiatePaymentMutation.mutate({
-      amount: Math.round(parseFloat(planPrice) * 100), // Convert to cents
+    createPaymentMutation.mutate({
       memberId,
       planId,
+      amount: parseFloat(planPrice),
+      paymentMethod,
+      notes: notes.trim() || undefined,
+    }, {
+      onSuccess: () => {
+        setMemberId('');
+        setPlanId('');
+        setPlanPrice('');
+        setPaymentMethod('');
+        setNotes('');
+        showSnackbar('Payment registered successfully!', 'success');
+      },
+      onError: (error: any) => {
+        showSnackbar(error.message || 'Failed to register payment', 'error');
+      },
+      onSettled: () => setIsProcessingPayment(false),
     });
   };
 
@@ -160,22 +149,43 @@ export function PaymentForm() {
           margin="normal"
           InputProps={{ startAdornment: '$' }}
         />
-        <Box sx={{ mb: 2, mt: 2 }}>
-          <CardElement
-            options={{
-              style: { base: { fontSize: '16px' } },
-              hidePostalCode: true,
-            }}
-          />
-        </Box>
+        <FormControl required fullWidth margin="normal">
+          <InputLabel id="payment-method-label">Payment Method</InputLabel>
+          <Select
+            labelId="payment-method-label"
+            id="payment-method-select"
+            value={paymentMethod}
+            label="Payment Method"
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            variant="outlined"
+          >
+            <MenuItem value="cash">Cash</MenuItem>
+            <MenuItem value="card">Card (Manual)</MenuItem>
+            <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
+            <MenuItem value="check">Check</MenuItem>
+            <MenuItem value="other">Other</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          label="Notes (Optional)"
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={3}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          margin="normal"
+          placeholder="Additional payment information, reference numbers, etc."
+        />
         <Button
           type="submit"
           variant="contained"
           color="primary"
           fullWidth
           disabled={submitPaymentButtonDisabled}
+          sx={{ mt: 2 }}
         >
-          {isProcessingPayment ? <CircularProgress size={24} /> : 'Pay'}
+          {isProcessingPayment ? <CircularProgress size={24} /> : 'Register Payment'}
         </Button>
       </form>
     </Paper>

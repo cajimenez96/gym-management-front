@@ -29,19 +29,46 @@ type MenuItem = {
   text: string;
   icon: typeof SvgIcon;
   path: string;
+  roles: Array<'owner' | 'admin'>; // Add role-based access control
 };
 
 export const MENU_ITEMS: MenuItem[] = [
-  { text: 'Register Member', icon: PersonAddIcon, path: '/register' },
-  { text: 'Member List', icon: PeopleIcon, path: '/members' },
-  { text: 'Process Payment', icon: PaymentIcon, path: '/payment' },
-  { text: 'Payment History', icon: HistoryIcon, path: '/payment-history' },
+  { 
+    text: 'Register Member', 
+    icon: PersonAddIcon, 
+    path: '/register', 
+    roles: ['owner'] // Only owner can register members
+  },
+  { 
+    text: 'Member List', 
+    icon: PeopleIcon, 
+    path: '/members', 
+    roles: ['owner'] // Both can view members (admin needs for check-in)
+  },
+  { 
+    text: 'Process Payment', 
+    icon: PaymentIcon, 
+    path: '/payment', 
+    roles: ['owner'] // Only owner handles payments
+  },
+  { 
+    text: 'Payment History', 
+    icon: HistoryIcon, 
+    path: '/payment-history', 
+    roles: ['owner'] // Only owner handles payments
+  },
   {
     text: 'Membership Plans',
     icon: CardMembershipIcon,
     path: '/membership-plans',
+    roles: ['owner'] // Only owner manages plans
   },
-  { text: 'Member Check-in', icon: HowToRegIcon, path: '/check-in' },
+  { 
+    text: 'Member Check-in', 
+    icon: HowToRegIcon, 
+    path: '/check-in', 
+    roles: ['owner', 'admin'] // Both can do check-ins (admin's main function)
+  },
 ];
 
 type MenuItemProps = MenuItem & {
@@ -53,6 +80,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   text,
   icon: Icon,
   path,
+  roles, // Include roles but we don't need to use it in the component
   isSelected,
   onClick,
 }) => (
@@ -71,16 +99,24 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
 function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const matchRoute = useMatchRoute();
+  
   const handleLogout = async () => {
     await logout();
     await router.invalidate();
     await router.navigate(LoginRoute);
   };
+  
   const isSelectedRoute = (path: string) => {
     return matchRoute({ to: path, fuzzy: true });
   };
+
+  // Filter menu items based on user role
+  const userRole = user?.role;
+  const filteredMenuItems = MENU_ITEMS.filter(item => 
+    userRole && item.roles.includes(userRole)
+  );
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -88,15 +124,21 @@ function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
         <Typography variant="h6" component="div">
           Gym Management
         </Typography>
+        {user && (
+          <Typography variant="caption" color="text.secondary">
+            {user.username} ({user.role})
+          </Typography>
+        )}
       </Box>
       <Divider />
       <List>
-        {MENU_ITEMS.map(({ text, icon, path }) => (
+        {filteredMenuItems.map(({ text, icon, path, roles }) => (
           <MenuItem
             key={text}
             text={text}
             icon={icon}
             path={path}
+            roles={roles}
             isSelected={isSelectedRoute(path)}
             onClick={onItemClick}
           />
