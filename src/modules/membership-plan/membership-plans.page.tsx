@@ -53,9 +53,15 @@ export function MembershipPlansPage() {
       { field: 'name', headerName: 'Nombre', flex: 1, minWidth: 150 },
       {
         field: 'duration',
-        headerName: 'Duración (meses)',
+        headerName: 'Duración',
         flex: 1,
         width: 150,
+        valueFormatter: (value: string) => {
+          if (value === 'daily') return 'Diario';
+          if (value === 'weekly') return 'Semanal';
+          if (value === 'monthly') return 'Mensual';
+          return value;
+        },
       },
       {
         field: 'price',

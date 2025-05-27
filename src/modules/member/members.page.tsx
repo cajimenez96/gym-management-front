@@ -25,6 +25,7 @@ import {
   useGetMembers,
   useUpdateMember,
 } from '@/modules/member';
+import { useMembershipPlans, MembershipPlan } from '@/modules/membership-plan';
 import { FormEvent, useState, useMemo } from 'react';
 import { LoadingAnimation } from '@/components';
 
@@ -32,7 +33,8 @@ export function MembersPage() {
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const { mutate: updateMember } = useUpdateMember();
   const { mutate: deleteMember } = useDeleteMember();
-  const { data: members = [], isLoading, isError } = useGetMembers();
+  const { data: members = [], isLoading: isLoadingMembers, isError: isMembersError } = useGetMembers();
+  const { data: membershipPlans = [], isLoading: isLoadingPlans, isError: isPlansError } = useMembershipPlans();
 
   const handleEditClick = (member: Member) => {
     setEditingMember(member);
@@ -59,6 +61,7 @@ export function MembersPage() {
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       status: formData.get('status') as MemberStatus,
+      membershipPlanId: formData.get('membershipPlanId') as string | null,
     };
     updateMember({ id: editingMember.id, data: memberData });
     handleEditClose();
@@ -79,6 +82,16 @@ export function MembersPage() {
       },
       { field: 'email', headerName: 'Email', width: 200 },
       { field: 'phone', headerName: 'Phone', width: 150 },
+      {
+        field: 'membershipPlanId',
+        headerName: 'Plan',
+        width: 150,
+        valueFormatter: (value: string | null) => {
+          if (!value) return 'Sin plan';
+          const plan = membershipPlans.find(p => p.id === value);
+          return plan ? plan.name : 'Plan no encontrado';
+        },
+      },
       { field: 'status', headerName: 'Status', width: 120 },
       {
         field: 'actions',
@@ -110,12 +123,12 @@ export function MembersPage() {
     [],
   );
 
-  if (isLoading) {
+  if (isLoadingMembers || isLoadingPlans) {
     return <LoadingAnimation />;
   }
 
-  if (isError) {
-    return <Typography color="error">An error occurred</Typography>;
+  if (isMembersError || isPlansError) {
+    return <Typography color="error">An error occurred while loading data.</Typography>;
   }
 
   return (
@@ -164,6 +177,23 @@ export function MembersPage() {
               fullWidth
               defaultValue={editingMember?.phone || ''}
             />
+            <FormControl fullWidth margin="dense">
+              <InputLabel id="membership-plan-label">Plan de Membresía</InputLabel>
+              <Select
+                labelId="membership-plan-label"
+                name="membershipPlanId"
+                defaultValue={editingMember?.membershipPlanId || ''}
+                label="Plan de Membresía"
+                variant="outlined"
+              >
+                <MenuItem value=""><em>Sin plan</em></MenuItem>
+                {membershipPlans.map((plan: MembershipPlan) => (
+                  <MenuItem key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl fullWidth margin="dense">
               <InputLabel id="status-label">Status</InputLabel>
               <Select

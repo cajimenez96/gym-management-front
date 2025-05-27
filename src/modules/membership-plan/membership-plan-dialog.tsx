@@ -5,6 +5,10 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
 } from '@mui/material';
 import {
   MembershipPlan,
@@ -32,7 +36,7 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
     const formData = new FormData(event.currentTarget);
     const planData = {
       name: formData.get('name') as string,
-      duration: Number(formData.get('duration')),
+      duration: formData.get('duration') as string,
       price: Number(formData.get('price')),
     };
 
@@ -66,14 +70,19 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
             fullWidth
             defaultValue={plan?.name || ''}
           />
-          <TextField
-            margin="dense"
-            name="duration"
-            label="Duración (meses)"
-            type="number"
-            fullWidth
-            defaultValue={plan?.duration || ''}
-          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel id="duration-label">Duración</InputLabel>
+            <Select
+              labelId="duration-label"
+              name="duration"
+              label="Duración"
+              defaultValue={plan?.duration || ''}
+            >
+              <MenuItem value="daily">Diario</MenuItem>
+              <MenuItem value="weekly">Semanal</MenuItem>
+              <MenuItem value="monthly">Mensual</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             margin="dense"
             name="price"

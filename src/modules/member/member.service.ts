@@ -4,6 +4,7 @@ import {
   MemberStatus,
   UpdateMemberData,
   MemberRepository,
+  MemberCheckInInfoDto,
 } from '@/modules/member';
 
 export class MemberService {
@@ -61,5 +62,9 @@ export class MemberService {
       console.error('Error updating member status:', error);
       return false;
     }
+  }
+
+  async getMemberCheckInInfoByDni(dni: string): Promise<MemberCheckInInfoDto> {
+    return this.memberRepository.getCheckInInfoByDni(dni);
   }
 }

@@ -4,7 +4,8 @@ import {
   Member, 
   UpdateMemberData,
   SearchMemberByDniData,
-  RenewMembershipData
+  RenewMembershipData,
+  MemberCheckInInfoDto
 } from '@/modules/member';
 import { AxiosInstance } from 'axios';
 
@@ -63,8 +64,8 @@ export class MemberRepository {
     const response = await this.apiClient.patch<Member>(
       `${MEMBERS_URL}/${renewData.dni}/renew`,
       {
-        fechaRenovacion: renewData.fechaRenovacion,
-        plan: renewData.plan
+        renewalDate: renewData.renewalDate,
+        membershipPlanId: renewData.membershipPlanId
       }
     );
     return response.data;
@@ -86,5 +87,17 @@ export class MemberRepository {
   async updateMemberStatuses(): Promise<{ message: string }> {
     const response = await this.apiClient.post<{ message: string }>(`${MEMBERS_URL}/update-statuses`);
     return response.data;
+  }
+
+  async getCheckInInfoByDni(dni: string): Promise<MemberCheckInInfoDto> {
+    try {
+      const response = await this.apiClient.get<MemberCheckInInfoDto>(`${MEMBERS_URL}/check-in-info/${dni}`);
+      return response.data;
+    } catch (error: any) {
+      // Siempre relanzar el error para que React Query lo maneje y lo ponga en el estado 'error' del hook.
+      // El console.error aquí es opcional, ya que el hook o el componente que lo usa pueden manejar el loggeo.
+      // console.error('Error fetching check-in info by DNI in repository:', error.response?.data || error.message);
+      throw error; 
+    }
   }
 }

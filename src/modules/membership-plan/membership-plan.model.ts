@@ -1,7 +1,7 @@
 export interface MembershipPlan {
   id: string;
   name: string;
-  duration: number;
+  duration: string;
   price: number;
 }
 

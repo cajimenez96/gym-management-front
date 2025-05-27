@@ -13,12 +13,13 @@ import {
 import { 
   CreateMemberData, 
   MembershipStatus, 
-  MembershipPlan,
   useRegisterMember 
 } from '@/modules/member';
+import { useMembershipPlans, MembershipPlan as MembershipPlanEntity } from '@/modules/membership-plan';
 
 export function RegisterMemberForm() {
   const { mutateAsync: registerMember, isPending } = useRegisterMember();
+  const { data: membershipPlans = [], isLoading: isLoadingPlans } = useMembershipPlans();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,7 +34,7 @@ export function RegisterMemberForm() {
       startDate: new Date().toISOString(),
       renewalDate: formData.get('renewalDate') as string,
       membershipStatus: formData.get('membershipStatus') as MembershipStatus,
-      membershipPlan: formData.get('membershipPlan') as MembershipPlan,
+      membershipPlanId: formData.get('membershipPlanId') as string || null,
     };
     
     await registerMember(memberData);
@@ -132,23 +133,30 @@ export function RegisterMemberForm() {
           
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth required>
-              <InputLabel>Plan de Membresía</InputLabel>
+              <InputLabel id="membership-plan-id-label">Plan de Membresía</InputLabel>
               <Select
-                name="membershipPlan"
+                name="membershipPlanId"
+                labelId="membership-plan-id-label"
                 label="Plan de Membresía"
-                defaultValue="monthly"
+                defaultValue=""
+                disabled={isLoadingPlans}
               >
-                <MenuItem value="monthly">Mensual</MenuItem>
-                <MenuItem value="custom">Personalizado</MenuItem>
+                <MenuItem value=""><em>Sin plan</em></MenuItem>
+                {membershipPlans.map((plan: MembershipPlanEntity) => (
+                  <MenuItem key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
           
           <Grid item xs={12}>
             <FormControl fullWidth required>
-              <InputLabel>Estado de Membresía</InputLabel>
+              <InputLabel id="membership-status-label">Estado de Membresía</InputLabel>
               <Select
                 name="membershipStatus"
+                labelId="membership-status-label"
                 label="Estado de Membresía"
                 defaultValue="active"
               >
@@ -162,7 +170,7 @@ export function RegisterMemberForm() {
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
               <Button
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || isLoadingPlans}
                 variant="contained"
                 color="primary"
                 size="large"

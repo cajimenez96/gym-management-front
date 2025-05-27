@@ -8,6 +8,7 @@ import {
   RenewMembershipData,
   MemberRepository,
   MemberService,
+  MemberCheckInInfoDto,
 } from '@/modules/member';
 
 const memberRepository = new MemberRepository();
@@ -144,4 +145,25 @@ export const useUpdateMemberStatuses = () => {
       console.error('Error updating member statuses:', error);
     },
   });
+};
+
+export const useGetMemberCheckInInfoByDni = (dni: string | null, options?: { enabled?: boolean }) => {
+  return useQuery<MemberCheckInInfoDto, Error>(
+    {
+      queryKey: ['memberCheckInInfo', dni],
+      queryFn: async () => {
+        if (!dni) {
+          return Promise.reject(new Error('DNI no puede ser nulo para la búsqueda.'));
+        }
+        return memberService.getMemberCheckInInfoByDni(dni);
+      },
+      enabled: options?.enabled !== undefined ? options.enabled && !!dni : !!dni,
+      retry: (failureCount, error: any) => {
+        if (error.response?.status === 404) {
+          return false;
+        }
+        return failureCount < 2;
+      },
+    }
+  );
 };

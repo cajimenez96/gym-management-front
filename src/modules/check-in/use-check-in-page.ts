@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { useGetMembers } from '@/modules/member';
 import { useCreateCheckIn, useGetCheckIns } from '@/modules/check-in';
 import { useSnackbar } from '@/context';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useCheckInPage = () => {
-  const [selectedMemberId, setSelectedMemberId] = useState('');
+  const queryClient = useQueryClient();
+
   const {
     data: members = [],
     isLoading: isMembersLoading,
@@ -16,49 +18,40 @@ export const useCheckInPage = () => {
     isLoading: isCheckInsLoading,
     isError: isCheckInsError,
   } = useGetCheckIns();
-  const { mutate: checkInMemberMutation, isPending: isCheckInPending } =
+  const { mutate: performCheckInMutation, isPending: isCheckInPending } =
     useCreateCheckIn();
   const { showSnackbar } = useSnackbar();
 
   const isDataLoading = isCheckInsLoading || isMembersLoading;
   const isError = isMembersError || isCheckInsError;
 
-  const checkInMember = () => {
-    if (!selectedMemberId) {
+  const checkInMember = (memberId: string) => {
+    if (!memberId) {
+      showSnackbar('ID de miembro inválido para el check-in.', 'error');
+      console.error('Attempted check-in with invalid memberId');
       return;
     }
 
-    checkInMemberMutation(selectedMemberId, {
+    performCheckInMutation(memberId, {
       onSuccess: () => {
-        showSnackbar('Check-in successful!', 'success');
+        showSnackbar('¡Check-in registrado exitosamente!', 'success');
+        queryClient.invalidateQueries({ queryKey: ['checkIns'] });
       },
-      onError: () => {
-        showSnackbar('Check-in failed', 'error');
+      onError: (error: any) => {
+        const message = error.response?.data?.message || error.message || 'Falló el registro del check-in.';
+        showSnackbar(message, 'error');
       },
     });
   };
 
-  const filteredCheckIns = selectedMemberId
-    ? checkIns.filter((checkIn) => checkIn.memberId === selectedMemberId)
-    : checkIns;
-
-  const handleMemberChange = (event: SelectChangeEvent) => {
-    const memberId = event.target.value;
-    setSelectedMemberId(memberId);
-    const selectedMember = members.find((member) => member.id === memberId);
-    if (selectedMember && selectedMember.status !== 'Active') {
-      showSnackbar('Warning: The selected member is not active.', 'warning');
-    }
-  };
+  const filteredCheckIns = checkIns;
 
   return {
     checkInMember,
     filteredCheckIns,
-    handleMemberChange,
     isCheckInPending,
     isDataLoading,
     isError,
     members,
-    selectedMemberId,
   };
 };
