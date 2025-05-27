@@ -40,9 +40,9 @@ export const SearchableMemberSelect: React.FC<SearchableMemberSelectProps> = ({
       <Autocomplete
         id="member-select-autocomplete"
         options={members}
-        getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+        getOptionLabel={(option) => `${option.dni} - ${option.firstName} ${option.lastName}`}
         renderInput={(params) => (
-          <TextField {...params} label="Select Member" />
+          <TextField {...params} label="Seleccionar Miembro por DNI o Nombre" />
         )}
         value={members.find((member) => member.id === selectedMemberId) || null}
         onChange={handleChange}
@@ -62,25 +62,25 @@ function CheckInTable({
   const columns: GridColDef[] = [
     {
       field: 'date',
-      headerName: 'Date',
+      headerName: 'Fecha',
       width: 110,
       valueGetter: (_, row) => format(parseISO(row.dateTime), 'yyyy-MM-dd'),
     },
     {
       field: 'time',
-      headerName: 'Time',
+      headerName: 'Hora',
       width: 110,
       valueGetter: (_, row) => format(parseISO(row.dateTime ?? ''), 'HH:mm'),
     },
     {
       field: 'firstName',
-      headerName: 'First Name',
+      headerName: 'Nombre',
       width: 130,
       valueGetter: (_, row) => row.member.firstName,
     },
     {
       field: 'lastName',
-      headerName: 'Last Name',
+      headerName: 'Apellido',
       width: 130,
       valueGetter: (_, row) => row.member.lastName,
     },
@@ -133,7 +133,7 @@ export function CheckInPage() {
   }
 
   if (isError) {
-    return <Typography>An error occurred</Typography>;
+    return <Typography>Ocurrió un error</Typography>;
   }
 
   return (
@@ -141,7 +141,7 @@ export function CheckInPage() {
       sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2 }}
     >
       <Typography variant="h4" gutterBottom>
-        Gym Check-In System
+        Sistema de Check-In Gimnasio
       </Typography>
       <Box sx={{ mb: 2 }}>
         <SearchableMemberSelect
@@ -159,7 +159,7 @@ export function CheckInPage() {
           disabled={isCheckInPending || !selectedMemberId}
           sx={{ mt: 2, width: '100%' }}
         >
-          Check In
+          Registrar Check-In
         </Button>
       </Box>
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>

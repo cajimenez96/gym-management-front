@@ -53,7 +53,7 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
-        {plan ? 'Edit Membership Plan' : 'Create Membership Plan'}
+        {plan ? 'Editar Plan de Membresía' : 'Crear Plan de Membresía'}
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
@@ -61,7 +61,7 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
             autoFocus
             margin="dense"
             name="name"
-            label="Plan Name"
+            label="Nombre del Plan"
             type="text"
             fullWidth
             defaultValue={plan?.name || ''}
@@ -69,7 +69,7 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
           <TextField
             margin="dense"
             name="duration"
-            label="Duration (months)"
+            label="Duración (meses)"
             type="number"
             fullWidth
             defaultValue={plan?.duration || ''}
@@ -77,7 +77,7 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
           <TextField
             margin="dense"
             name="price"
-            label="Price"
+            label="Precio"
             type="text"
             fullWidth
             defaultValue={plan?.price || ''}
@@ -88,8 +88,8 @@ export const MembershipPlanDialog: React.FC<MembershipPlanDialogProps> = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit">{plan ? 'Update' : 'Create'}</Button>
+          <Button onClick={onClose}>Cancelar</Button>
+          <Button type="submit">{plan ? 'Actualizar' : 'Crear'}</Button>
         </DialogActions>
       </form>
     </Dialog>

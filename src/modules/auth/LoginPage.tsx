@@ -40,13 +40,13 @@ export function LoginPage() {
 		const newErrors: Partial<LoginRequest> = {};
 
 		if (!credentials.username.trim()) {
-			newErrors.username = 'Username is required';
+			newErrors.username = 'El nombre de usuario es requerido';
 		}
 
 		if (!credentials.password) {
-			newErrors.password = 'Password is required';
+			newErrors.password = 'La contraseña es requerida';
 		} else if (credentials.password.length < 3) {
-			newErrors.password = 'Password must be at least 3 characters';
+			newErrors.password = 'La contraseña debe tener al menos 3 caracteres';
 		}
 
 		setErrors(newErrors);
@@ -129,10 +129,10 @@ export function LoginPage() {
 							<GymIcon sx={{ fontSize: 32 }} />
 						</Avatar>
 						<Typography component="h1" variant="h4" color="primary" fontWeight="bold">
-							Gym Management
+							Gestión de Gimnasio
 						</Typography>
 						<Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
-							Sign in to your account
+							Inicia sesión en tu cuenta
 						</Typography>
 					</Box>
 
@@ -150,7 +150,7 @@ export function LoginPage() {
 							required
 							fullWidth
 							id="username"
-							label="Username"
+							label="Usuario"
 							name="username"
 							autoComplete="username"
 							autoFocus
@@ -173,7 +173,7 @@ export function LoginPage() {
 							required
 							fullWidth
 							name="password"
-							label="Password"
+							label="Contraseña"
 							type={showPassword ? 'text' : 'password'}
 							id="password"
 							autoComplete="current-password"
@@ -191,7 +191,7 @@ export function LoginPage() {
 								endAdornment: (
 									<InputAdornment position="end">
 										<IconButton
-											aria-label="toggle password visibility"
+											aria-label="mostrar/ocultar contraseña"
 											onClick={togglePasswordVisibility}
 											edge="end"
 											disabled={isLoading}
@@ -214,10 +214,10 @@ export function LoginPage() {
 							{isLoading ? (
 								<>
 									<CircularProgress size={20} sx={{ mr: 1 }} />
-									Signing in...
+									Iniciando sesión...
 								</>
 							) : (
-								'Sign In'
+								'Iniciar Sesión'
 							)}
 						</Button>
 					</Box>
@@ -225,13 +225,13 @@ export function LoginPage() {
 					{/* Demo Credentials */}
 					<Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
 						<Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-							Demo Credentials:
+							Credenciales de Demostración:
 						</Typography>
 						<Typography variant="caption" display="block">
-							<strong>Owner:</strong> admin_owner / owner123
+							<strong>Propietario:</strong> admin_owner / owner123
 						</Typography>
 						<Typography variant="caption" display="block">
-							<strong>Admin:</strong> admin_checkin / admin123
+							<strong>Administrador:</strong> admin_checkin / admin123
 						</Typography>
 					</Box>
 				</Paper>

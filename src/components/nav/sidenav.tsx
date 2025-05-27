@@ -34,37 +34,37 @@ type MenuItem = {
 
 export const MENU_ITEMS: MenuItem[] = [
   { 
-    text: 'Register Member', 
+    text: 'Registrar Miembro', 
     icon: PersonAddIcon, 
     path: '/register', 
     roles: ['owner'] // Only owner can register members
   },
   { 
-    text: 'Member List', 
+    text: 'Lista de Miembros', 
     icon: PeopleIcon, 
     path: '/members', 
     roles: ['owner'] // Both can view members (admin needs for check-in)
   },
   { 
-    text: 'Process Payment', 
+    text: 'Procesar Pago', 
     icon: PaymentIcon, 
     path: '/payment', 
     roles: ['owner'] // Only owner handles payments
   },
   { 
-    text: 'Payment History', 
+    text: 'Historial de Pagos', 
     icon: HistoryIcon, 
     path: '/payment-history', 
     roles: ['owner'] // Only owner handles payments
   },
   {
-    text: 'Membership Plans',
+    text: 'Planes de Membresía',
     icon: CardMembershipIcon,
     path: '/membership-plans',
     roles: ['owner'] // Only owner manages plans
   },
   { 
-    text: 'Member Check-in', 
+    text: 'Check-in de Miembro', 
     icon: HowToRegIcon, 
     path: '/check-in', 
     roles: ['owner', 'admin'] // Both can do check-ins (admin's main function)
@@ -122,7 +122,7 @@ function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" component="div">
-          Gym Management
+          Gestión de Gimnasio
         </Typography>
         {user && (
           <Typography variant="caption" color="text.secondary">
@@ -150,7 +150,7 @@ function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>
-          <ListItemText primary="Logout" />
+          <ListItemText primary="Cerrar Sesión" />
         </ListItemButton>
       </Box>
     </Box>

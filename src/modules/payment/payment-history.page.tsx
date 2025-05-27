@@ -6,29 +6,29 @@ import { LoadingAnimation } from '@/components'; // Adjust the import path as ne
 const columns: GridColDef[] = [
   {
     field: 'id',
-    headerName: 'Payment ID',
+    headerName: 'ID de Pago',
     flex: 1,
     minWidth: 150,
   },
   {
     field: 'memberName',
-    headerName: 'Member Name',
+    headerName: 'Nombre del Miembro',
     flex: 1,
     minWidth: 200,
   },
   {
     field: 'amount',
-    headerName: 'Amount',
+    headerName: 'Monto',
     flex: 1,
     minWidth: 150,
     valueFormatter: (value) => {
       if (value == null) {
         return '';
       }
-      const amount = value / 100;
-      return amount.toLocaleString('en-US', {
+      const amount = value / 100; // Assuming value is in cents
+      return amount.toLocaleString('es-AR', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'ARS',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
@@ -36,19 +36,19 @@ const columns: GridColDef[] = [
   },
   {
     field: 'date',
-    headerName: 'Date',
+    headerName: 'Fecha',
     flex: 1,
     minWidth: 150,
     valueFormatter: (value) => {
       if (value == null) {
         return '';
       }
-      return new Date(value).toLocaleDateString();
+      return new Date(value).toLocaleDateString('es-ES');
     },
   },
   {
     field: 'status',
-    headerName: 'Status',
+    headerName: 'Estado',
     flex: 1,
     minWidth: 150,
   },
@@ -65,7 +65,7 @@ export function PaymentHistoryPage() {
     return (
       <Container maxWidth={false} sx={{ mt: 4, mb: 4 }}>
         <Typography color="error" variant="h6">
-          Error loading payments: {error.message}
+          Error al cargar los pagos: {error.message}
         </Typography>
       </Container>
     );
@@ -85,7 +85,7 @@ export function PaymentHistoryPage() {
         sx={{ mt: 4, mb: 4, flex: 1, display: 'flex', flexDirection: 'column' }}
       >
         <Typography variant="h4" gutterBottom component="h1">
-          Payment History
+          Historial de Pagos
         </Typography>
         <Box sx={{ flexGrow: 1, width: '100%', height: '100%' }}>
           <DataGrid

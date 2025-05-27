@@ -4,6 +4,8 @@ import {
   CreateMemberData,
   Member,
   UpdateMemberData,
+  SearchMemberByDniData,
+  RenewMembershipData,
   MemberRepository,
   MemberService,
 } from '@/modules/member';
@@ -19,6 +21,8 @@ export const useRegisterMember = () => {
     mutationFn: (data: CreateMemberData) => memberService.createMember(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['members'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'active'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'expired'] });
       showSnackbar('Member registered successfully!', 'success');
     },
     onError: (error) => {
@@ -47,6 +51,8 @@ export const useUpdateMember = () => {
     mutationFn: ({ id, data }) => memberService.updateMember(id, data),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['members'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'active'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'expired'] });
       showSnackbar('Member updated successfully!', 'success');
     },
     onError: (error) => {
@@ -63,11 +69,79 @@ export const useDeleteMember = () => {
     mutationFn: (id: string) => memberService.deleteMember(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['members'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'active'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'expired'] });
       showSnackbar('Member deleted successfully!', 'success');
     },
     onError: (error) => {
       showSnackbar('Failed to delete member. Please try again.', 'error');
       console.error('Error delete member:', error);
+    },
+  });
+};
+
+export const useSearchMemberByDni = (dni: string, enabled = true) => {
+  return useQuery<Member | null, Error>({
+    queryKey: ['members', 'dni', dni],
+    queryFn: () => memberRepository.findByDni(dni),
+    enabled: enabled && dni.length > 0,
+    staleTime: 30000,
+  });
+};
+
+export const useRenewMembership = () => {
+  const queryClient = useQueryClient();
+  const { showSnackbar } = useSnackbar();
+
+  return useMutation<Member, Error, RenewMembershipData>({
+    mutationFn: (renewData: RenewMembershipData) => memberRepository.renewMembership(renewData),
+    onSuccess: async (updatedMember) => {
+      await queryClient.invalidateQueries({ queryKey: ['members'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'active'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'expired'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'dni', updatedMember.dni] });
+      
+      showSnackbar(`Membership renewed successfully for DNI: ${updatedMember.dni}`, 'success');
+    },
+    onError: (error) => {
+      showSnackbar('Failed to renew membership. Please try again.', 'error');
+      console.error('Error renewing membership:', error);
+    },
+  });
+};
+
+export const useGetActiveMembers = () => {
+  return useQuery<Member[], Error>({
+    queryKey: ['members', 'active'],
+    queryFn: () => memberRepository.getActiveMembers(),
+    staleTime: 60000,
+  });
+};
+
+export const useGetExpiredMembers = () => {
+  return useQuery<Member[], Error>({
+    queryKey: ['members', 'expired'],
+    queryFn: () => memberRepository.getExpiredMembers(),
+    staleTime: 60000,
+  });
+};
+
+export const useUpdateMemberStatuses = () => {
+  const queryClient = useQueryClient();
+  const { showSnackbar } = useSnackbar();
+
+  return useMutation<{ message: string }, Error>({
+    mutationFn: () => memberRepository.updateMemberStatuses(),
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({ queryKey: ['members'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'active'] });
+      await queryClient.invalidateQueries({ queryKey: ['members', 'expired'] });
+      
+      showSnackbar(response.message || 'Member statuses updated successfully!', 'success');
+    },
+    onError: (error) => {
+      showSnackbar('Failed to update member statuses. Please try again.', 'error');
+      console.error('Error updating member statuses:', error);
     },
   });
 };

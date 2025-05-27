@@ -78,9 +78,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	// Initialize auth on mount
 	useEffect(() => {
+		dispatch({ type: 'AUTH_LOADING' }); // Ensure loading state is true during async check
 		const initAuth = async () => {
 			try {
-				const { user, token } = AuthService.initializeAuth();
+				const { user, token } = await AuthService.initializeAuth(); // Await the async initializeAuth
 				
 				if (user && token) {
 					dispatch({ 
@@ -91,8 +92,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 					dispatch({ type: 'AUTH_LOGOUT' });
 				}
 			} catch (error) {
-				console.error('Failed to initialize auth:', error);
-				dispatch({ type: 'AUTH_LOGOUT' });
+				console.error('Failed to initialize auth routine:', error); // More specific error message
+				dispatch({ type: 'AUTH_LOGOUT' }); // Ensure loading is set to false
 			}
 		};
 
@@ -125,7 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			
 			console.log('✅ Auth state updated successfully');
 		} catch (error: any) {
-			const errorMessage = error.response?.data?.message || 'Login failed';
+			const errorMessage = error.response?.data?.message || 'Error al iniciar sesión';
 			dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
 			throw error;
 		}
@@ -166,7 +167,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 export function useAuth(): AuthContextType {
 	const context = useContext(AuthContext);
 	if (context === undefined) {
-		throw new Error('useAuth must be used within an AuthProvider');
+		throw new Error('useAuth debe ser usado dentro de un AuthProvider');
 	}
 	return context;
 } 

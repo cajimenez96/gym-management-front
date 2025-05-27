@@ -42,7 +42,7 @@ export function LoginPage() {
       >
         <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
           <Typography component="h1" variant="h5" align="center">
-            Gym Management Login
+            Iniciar Sesión - Gestión de Gimnasio
           </Typography>
           <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
             <TextField
@@ -50,7 +50,7 @@ export function LoginPage() {
               required
               fullWidth
               id="username"
-              label="Username"
+              label="Usuario"
               name="username"
               autoComplete="username"
               autoFocus
@@ -62,7 +62,7 @@ export function LoginPage() {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Contraseña"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -76,7 +76,7 @@ export function LoginPage() {
               disabled={isLoggingIn}
               sx={{ mt: 3, mb: 2 }}
             >
-              {isLoggingIn ? 'Logging in...' : 'Login'}
+              {isLoggingIn ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Button>
           </Box>
         </Paper>

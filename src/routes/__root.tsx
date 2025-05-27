@@ -28,5 +28,5 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       </Suspense>
     </>
   ),
-  pendingComponent: () => <div>Loading...</div>,
+  pendingComponent: () => <div>Cargando...</div>,
 });

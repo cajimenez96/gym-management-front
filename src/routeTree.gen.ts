@@ -20,6 +20,7 @@ import { Route as AuthAuthPaymentImport } from './routes/_auth/_auth.payment'
 import { Route as AuthAuthMembershipPlansImport } from './routes/_auth/_auth.membership-plans'
 import { Route as AuthAuthMembersImport } from './routes/_auth/_auth.members'
 import { Route as AuthAuthCheckInImport } from './routes/_auth/_auth.check-in'
+import { Route as AuthAuthDashboardOwnerImport } from './routes/_auth/_auth.dashboard.owner'
 
 // Create/Update Routes
 
@@ -65,6 +66,11 @@ const AuthAuthMembersRoute = AuthAuthMembersImport.update({
 
 const AuthAuthCheckInRoute = AuthAuthCheckInImport.update({
   path: '/check-in',
+  getParentRoute: () => AuthAuthRoute,
+} as any)
+
+const AuthAuthDashboardOwnerRoute = AuthAuthDashboardOwnerImport.update({
+  path: '/dashboard/owner',
   getParentRoute: () => AuthAuthRoute,
 } as any)
 
@@ -135,6 +141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAuthRegisterImport
       parentRoute: typeof AuthAuthImport
     }
+    '/_auth/_auth/dashboard/owner': {
+      id: '/_auth/_auth/dashboard/owner'
+      path: '/dashboard/owner'
+      fullPath: '/dashboard/owner'
+      preLoaderRoute: typeof AuthAuthDashboardOwnerImport
+      parentRoute: typeof AuthAuthImport
+    }
   }
 }
 
@@ -150,6 +163,7 @@ export const routeTree = rootRoute.addChildren({
     AuthAuthPaymentRoute,
     AuthAuthPaymentHistoryRoute,
     AuthAuthRegisterRoute,
+    AuthAuthDashboardOwnerRoute,
   }),
 })
 
@@ -180,7 +194,8 @@ export const routeTree = rootRoute.addChildren({
         "/_auth/_auth/membership-plans",
         "/_auth/_auth/payment",
         "/_auth/_auth/payment-history",
-        "/_auth/_auth/register"
+        "/_auth/_auth/register",
+        "/_auth/_auth/dashboard/owner"
       ]
     },
     "/_auth/_auth/check-in": {
@@ -205,6 +220,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/_auth/register": {
       "filePath": "_auth/_auth.register.tsx",
+      "parent": "/_auth/_auth"
+    },
+    "/_auth/_auth/dashboard/owner": {
+      "filePath": "_auth/_auth.dashboard.owner.tsx",
       "parent": "/_auth/_auth"
     }
   }

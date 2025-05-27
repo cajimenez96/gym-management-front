@@ -29,7 +29,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <Toolbar>
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label="abrir menú"
               edge="start"
               onClick={handleDrawerToggle}
               sx={{ mr: 2 }}
@@ -37,7 +37,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" component="div">
-              Gym Management
+              Gestión de Gimnasio
             </Typography>
           </Toolbar>
         </AppBar>

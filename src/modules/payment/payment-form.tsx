@@ -47,17 +47,17 @@ export function PaymentForm() {
     event.preventDefault();
 
     if (!memberId) {
-      showSnackbar('Please select a Member', 'error');
+      showSnackbar('Por favor seleccione un Miembro', 'error');
       return;
     }
 
     if (!planId) {
-      showSnackbar('Please select a Plan', 'error');
+      showSnackbar('Por favor seleccione un Plan', 'error');
       return;
     }
 
     if (!paymentMethod) {
-      showSnackbar('Please select a Payment Method', 'error');
+      showSnackbar('Por favor seleccione un Método de Pago', 'error');
       return;
     }
 
@@ -75,10 +75,10 @@ export function PaymentForm() {
         setPlanPrice('');
         setPaymentMethod('');
         setNotes('');
-        showSnackbar('Payment registered successfully!', 'success');
+        showSnackbar('¡Pago registrado exitosamente!', 'success');
       },
       onError: (error: any) => {
-        showSnackbar(error.message || 'Failed to register payment', 'error');
+        showSnackbar(error.message || 'Error al registrar el pago', 'error');
       },
       onSettled: () => setIsProcessingPayment(false),
     });
@@ -89,19 +89,19 @@ export function PaymentForm() {
   }
 
   if (isError) {
-    return <Typography color="error">Error loading payment page</Typography>;
+    return <Typography color="error">Error al cargar la página de pago</Typography>;
   }
 
   return (
     <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
       <form onSubmit={handleSubmit}>
         <FormControl required fullWidth margin="normal">
-          <InputLabel id="member-select-label">Select Member</InputLabel>
+          <InputLabel id="member-select-label">Seleccionar Miembro</InputLabel>
           <Select
             labelId="member-select-label"
             id="member-select"
             value={memberId}
-            label="Select Member"
+            label="Seleccionar Miembro"
             onChange={(e) => setMemberId(e.target.value)}
             disabled={isMembersLoading}
             variant="outlined"
@@ -114,12 +114,12 @@ export function PaymentForm() {
           </Select>
         </FormControl>
         <FormControl required fullWidth margin="normal">
-          <InputLabel id="plan-select-label">Select Plan</InputLabel>
+          <InputLabel id="plan-select-label">Seleccionar Plan</InputLabel>
           <Select
             labelId="plan-select-label"
             id="plan-select"
             value={planId}
-            label="Select Plan"
+            label="Seleccionar Plan"
             onChange={(e) => {
               const plan = plans.find((p) => p.id === e.target.value);
               if (plan) {
@@ -141,7 +141,7 @@ export function PaymentForm() {
         </FormControl>
         <TextField
           disabled
-          label="Amount"
+          label="Monto"
           variant="outlined"
           fullWidth
           type="number"
@@ -150,24 +150,24 @@ export function PaymentForm() {
           InputProps={{ startAdornment: '$' }}
         />
         <FormControl required fullWidth margin="normal">
-          <InputLabel id="payment-method-label">Payment Method</InputLabel>
+          <InputLabel id="payment-method-label">Método de Pago</InputLabel>
           <Select
             labelId="payment-method-label"
             id="payment-method-select"
             value={paymentMethod}
-            label="Payment Method"
+            label="Método de Pago"
             onChange={(e) => setPaymentMethod(e.target.value)}
             variant="outlined"
           >
-            <MenuItem value="cash">Cash</MenuItem>
-            <MenuItem value="card">Card (Manual)</MenuItem>
-            <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
-            <MenuItem value="check">Check</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
+            <MenuItem value="cash">Efectivo</MenuItem>
+            <MenuItem value="card">Tarjeta (Manual)</MenuItem>
+            <MenuItem value="bank_transfer">Transferencia Bancaria</MenuItem>
+            <MenuItem value="check">Cheque</MenuItem>
+            <MenuItem value="other">Otro</MenuItem>
           </Select>
         </FormControl>
         <TextField
-          label="Notes (Optional)"
+          label="Notas (Opcional)"
           variant="outlined"
           fullWidth
           multiline
@@ -175,7 +175,7 @@ export function PaymentForm() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           margin="normal"
-          placeholder="Additional payment information, reference numbers, etc."
+          placeholder="Información adicional del pago, números de referencia, etc."
         />
         <Button
           type="submit"
@@ -185,7 +185,7 @@ export function PaymentForm() {
           disabled={submitPaymentButtonDisabled}
           sx={{ mt: 2 }}
         >
-          {isProcessingPayment ? <CircularProgress size={24} /> : 'Register Payment'}
+          {isProcessingPayment ? <CircularProgress size={24} /> : 'Registrar Pago'}
         </Button>
       </form>
     </Paper>

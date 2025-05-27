@@ -57,17 +57,33 @@ export class AuthService {
 	}
 
 	// Initialize auth on app start
-	static initializeAuth(): { user: User | null; token: string | null } {
+	static async initializeAuth(): Promise<{ user: User | null; token: string | null }> {
+		console.log('[AuthService.initializeAuth] Starting initialization...');
 		const token = this.getToken();
-		const user = this.getStoredUser();
+		let user = this.getStoredUser(); 
+
+		console.log('[AuthService.initializeAuth] Token from localStorage:', token);
+		console.log('[AuthService.initializeAuth] User from localStorage:', user);
 
 		if (token && user) {
-			// Set authorization header
+			console.log('[AuthService.initializeAuth] Token and user found in localStorage. Attempting to validate token...');
 			apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-			return { user, token };
+			console.log('[AuthService.initializeAuth] Authorization header set.');
+			try {
+				const freshUser = await this.getCurrentUser();
+				console.log('[AuthService.initializeAuth] getCurrentUser successful. Fresh user:', freshUser);
+				this.setStoredUser(freshUser); 
+				console.log('[AuthService.initializeAuth] Stored fresh user in localStorage.');
+				return { user: freshUser, token };
+			} catch (error) {
+				console.error('[AuthService.initializeAuth] Token validation failed (getCurrentUser errored). Clearing auth.', error);
+				this.clearAuth(); 
+				return { user: null, token: null };
+			}
+		} else {
+			console.log('[AuthService.initializeAuth] No token or user found in localStorage. Returning nulls.');
+			return { user: null, token: null };
 		}
-
-		return { user: null, token: null };
 	}
 
 	// Clear all auth data

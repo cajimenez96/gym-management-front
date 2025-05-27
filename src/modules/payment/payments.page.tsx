@@ -5,7 +5,7 @@ export function PaymentsPage() {
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 4 }}>
-        Manual Payment Registration
+        Registro Manual de Pago
       </Typography>
       <PaymentForm />
     </Container>

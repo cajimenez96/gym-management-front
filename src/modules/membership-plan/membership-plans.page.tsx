@@ -41,7 +41,7 @@ export function MembershipPlansPage() {
   const handleDeletePlan = (id: string) => {
     if (
       confirm(
-        'All memberships linked to this plan will be deleted. Are you sure you want to delete this plan?',
+        'Todas las membresías vinculadas a este plan serán eliminadas. ¿Estás seguro de que quieres eliminar este plan?',
       )
     ) {
       deleteMutation.mutate(id);
@@ -50,29 +50,29 @@ export function MembershipPlansPage() {
 
   const columns: GridColDef[] = useMemo(
     () => [
-      { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
+      { field: 'name', headerName: 'Nombre', flex: 1, minWidth: 150 },
       {
         field: 'duration',
-        headerName: 'Duration (months)',
+        headerName: 'Duración (meses)',
         flex: 1,
         width: 150,
       },
       {
         field: 'price',
-        headerName: 'Price',
+        headerName: 'Precio',
         width: 100,
         flex: 1,
-        valueFormatter: (value: number) => `$${value.toFixed(2)}`,
+        valueFormatter: (value: number) => `ARS ${value.toFixed(2)}`,
       },
       {
         field: 'actions',
-        headerName: 'Actions',
+        headerName: 'Acciones',
         width: 120,
         flex: 1,
         sortable: false,
         renderCell: (params) => (
           <>
-            <Tooltip title="Edit">
+            <Tooltip title="Editar">
               <IconButton
                 onClick={() => handleOpenDialog(params.row)}
                 size="small"
@@ -80,7 +80,7 @@ export function MembershipPlansPage() {
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip title="Eliminar">
               <IconButton
                 onClick={() => handleDeletePlan(params.row.id)}
                 size="small"
@@ -101,7 +101,7 @@ export function MembershipPlansPage() {
 
   if (isError) {
     return (
-      <Typography color="error">Error loading membership plans</Typography>
+      <Typography color="error">Error al cargar los planes de membresía</Typography>
     );
   }
 
@@ -110,7 +110,7 @@ export function MembershipPlansPage() {
       sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2 }}
     >
       <Typography variant="h4" gutterBottom>
-        Membership Plans
+        Planes de Membresía
       </Typography>
       <Box sx={{ mb: 2 }}>
         <Button
@@ -119,7 +119,7 @@ export function MembershipPlansPage() {
           onClick={() => handleOpenDialog()}
           sx={{ width: isMobile ? '100%' : 'auto' }}
         >
-          Create New Plan
+          Crear Nuevo Plan
         </Button>
       </Box>
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
