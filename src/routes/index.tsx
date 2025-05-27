@@ -10,8 +10,13 @@ export const Route = createFileRoute('/')({
     });
     
     if (isAuthenticated && user) {
-      console.log('✅ User authenticated, redirecting to /members');
-      throw redirect({ to: '/members' });
+      if (user.role === 'admin') {
+        console.log('✅ User authenticated, redirecting to /members');
+        throw redirect({ to: '/members' });
+      } else {
+        console.log('✅ User authenticated, redirecting to /check-in');
+        throw redirect({ to: '/check-in' });
+      }
     } else {
       console.log('❌ User not authenticated, redirecting to /login');
       throw redirect({ to: '/login' });
