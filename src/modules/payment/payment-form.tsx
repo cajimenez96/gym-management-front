@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 import { useGetMembers } from '@/modules/member';
 import { useMembershipPlans } from '@/modules/membership-plan';
 import { useCreateManualPayment } from '@/modules/payment/payment.hooks.ts';
@@ -23,7 +23,7 @@ export function PaymentForm() {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [notes, setNotes] = useState('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
   
   const {
     data: members = [],
@@ -131,7 +131,21 @@ export function PaymentForm() {
             variant="outlined"
           >
             {plans
-              .sort((a, b) => a.duration - b.duration)
+              .slice()
+              .sort((a, b) => {
+                const durationOrder: { [key: string]: number } = {
+                  'daily': 1,
+                  'weekly': 2,
+                  'monthly': 3,
+                };
+                const orderA = durationOrder[a.duration.toLowerCase()] || Infinity;
+                const orderB = durationOrder[b.duration.toLowerCase()] || Infinity;
+
+                if (orderA !== orderB) {
+                  return orderA - orderB;
+                }
+                return a.name.localeCompare(b.name);
+              })
               .map((plan) => (
                 <MenuItem key={plan.id} value={plan.id}>
                   {plan.name}

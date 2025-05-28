@@ -3,8 +3,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { 
 	Box, 
 	Button, 
-	Card, 
-	CardContent, 
 	TextField, 
 	Typography, 
 	Alert,
@@ -22,7 +20,7 @@ import {
 	VisibilityOff,
 	FitnessCenter as GymIcon
 } from '@mui/icons-material';
-import { useAuth } from './AuthContext';
+import { useAuthStore } from '@/stores/auth.store';
 import type { LoginRequest } from './auth.types';
 
 export function LoginPage() {
@@ -33,8 +31,15 @@ export function LoginPage() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [errors, setErrors] = useState<Partial<LoginRequest>>({});
 	
-	const { login, isLoading, error, clearError } = useAuth();
+	const login = useAuthStore(state => state.login);
+	const isLoading = useAuthStore(state => state.isLoading);
+	const authError = useAuthStore(state => state.error);
+	const clearAuthError = useAuthStore(state => state.clearError);
 	const navigate = useNavigate();
+
+	React.useEffect(() => {
+		clearAuthError();
+	}, [clearAuthError]);
 
 	const validateForm = (): boolean => {
 		const newErrors: Partial<LoginRequest> = {};
@@ -55,7 +60,7 @@ export function LoginPage() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		clearError();
+		clearAuthError();
 
 		if (!validateForm()) {
 			return;
@@ -137,9 +142,9 @@ export function LoginPage() {
 					</Box>
 
 					{/* Error Alert */}
-					{error && (
+					{authError && (
 						<Alert severity="error" sx={{ mb: 3 }}>
-							{error}
+							{authError}
 						</Alert>
 					)}
 

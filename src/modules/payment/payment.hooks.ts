@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 import {
   Payment,
   PaymentWithMember,
@@ -22,7 +22,7 @@ export const useInitiatePayment = (
   onSuccess: (data: { clientSecret: string; paymentIntentId: string }) => void,
   onFailure: () => void,
 ) => {
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
   return useMutation<
     { clientSecret: string; paymentIntentId: string },
     Error,
@@ -42,7 +42,7 @@ export const useInitiatePayment = (
 };
 
 export const useConfirmPayment = () => {
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (paymentIntentId: string) =>

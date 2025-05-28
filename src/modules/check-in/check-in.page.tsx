@@ -21,7 +21,7 @@ import { CheckIn } from '@/modules/check-in';
 import { Member, useGetMemberCheckInInfoByDni, MemberCheckInInfoDto } from '@/modules/member';
 import { format, parseISO } from 'date-fns';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 
 function CheckInTable({
   checkIns,
@@ -87,7 +87,7 @@ function CheckInTable({
 export function CheckInPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   const {
     checkInMember,

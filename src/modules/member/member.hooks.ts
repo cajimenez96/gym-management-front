@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 import {
   CreateMemberData,
   Member,
@@ -16,7 +16,7 @@ const memberService = new MemberService(memberRepository);
 
 export const useRegisterMember = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<Member, Error, CreateMemberData>({
     mutationFn: (data: CreateMemberData) => memberService.createMember(data),
@@ -42,7 +42,7 @@ export const useGetMembers = () => {
 
 export const useUpdateMember = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<
     Member | null,
@@ -65,7 +65,7 @@ export const useUpdateMember = () => {
 
 export const useDeleteMember = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
   return useMutation({
     mutationFn: (id: string) => memberService.deleteMember(id),
     onSuccess: async () => {
@@ -92,7 +92,7 @@ export const useSearchMemberByDni = (dni: string, enabled = true) => {
 
 export const useRenewMembership = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<Member, Error, RenewMembershipData>({
     mutationFn: (renewData: RenewMembershipData) => memberRepository.renewMembership(renewData),
@@ -129,7 +129,7 @@ export const useGetExpiredMembers = () => {
 
 export const useUpdateMemberStatuses = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<{ message: string }, Error>({
     mutationFn: () => memberRepository.updateMemberStatuses(),

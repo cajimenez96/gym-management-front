@@ -20,7 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Link, useRouter, useMatchRoute } from '@tanstack/react-router';
-import { useAuth } from '@/context';
+import { useAuthStore } from '@/stores/auth.store';
 import { Route as LoginRoute } from '@/routes/login.tsx';
 
 const DRAWER_WIDTH = 240;
@@ -99,7 +99,8 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
 function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
   const router = useRouter();
-  const { logout, user } = useAuth();
+  const logout = useAuthStore(state => state.logout);
+  const user = useAuthStore(state => state.user);
   const matchRoute = useMatchRoute();
   
   const handleLogout = async () => {

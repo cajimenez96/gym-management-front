@@ -1,10 +1,11 @@
-import { useAuth } from './AuthContext';
+import { useAuthStore } from '@/stores/auth.store';
 import type { User } from './auth.types';
 
 type UserRole = User['role'];
 
 export function useRoleAccess() {
-	const { user, isAuthenticated } = useAuth();
+	const user = useAuthStore(state => state.user);
+	const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
 	const hasRole = (requiredRole: UserRole): boolean => {
 		return isAuthenticated && user?.role === requiredRole;

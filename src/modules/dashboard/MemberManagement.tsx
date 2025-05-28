@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -18,6 +18,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -26,11 +27,10 @@ import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import {
   Member,
   MembershipStatus,
-  MembershipPlan,
   CreateMemberData,
   UpdateMemberData,
   useGetMembers,
@@ -39,8 +39,12 @@ import {
   useDeleteMember,
   useUpdateMemberStatuses,
 } from '@/modules/member';
+import {
+  MembershipPlan as MembershipPlanType, // Renamed for clarity
+  useMembershipPlans,
+} from '@/modules/membership-plan';
 import { LoadingAnimation } from '@/components';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 
 interface MemberManagementProps {
   onMemberSelect?: (member: Member) => void;
@@ -52,31 +56,29 @@ export function MemberManagement({ onMemberSelect }: MemberManagementProps) {
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<MembershipStatus | 'all'>('all');
 
-  const { data: members = [], isLoading, isError, refetch } = useGetMembers();
+  const { data: members = [], isLoading: isLoadingMembers, isError: isErrorMembers, refetch } = useGetMembers();
+  const { data: membershipPlans = [], isLoading: isLoadingPlans, isError: isErrorPlans } = useMembershipPlans();
+  
   const { mutate: createMember, isPending: isCreating } = useRegisterMember();
   const { mutate: updateMember, isPending: isUpdating } = useUpdateMember();
-  const { mutate: deleteMember } = useDeleteMember();
+  const { mutate: deleteMember, isPending: isDeleting } = useDeleteMember();
   const { mutate: updateStatuses, isPending: isUpdatingStatuses } = useUpdateMemberStatuses();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
-  // Filter members based on search and status
   const filteredMembers = useMemo(() => {
-    let filtered = members;
-
+    let currentMembers = members;
     if (searchFilter) {
-      filtered = filtered.filter(
+      currentMembers = currentMembers.filter(
         (member) =>
           member.dni.toLowerCase().includes(searchFilter.toLowerCase()) ||
           member.firstName.toLowerCase().includes(searchFilter.toLowerCase()) ||
           member.lastName.toLowerCase().includes(searchFilter.toLowerCase())
       );
     }
-
     if (statusFilter !== 'all') {
-      filtered = filtered.filter((member) => member.membershipStatus === statusFilter);
+      currentMembers = currentMembers.filter((member) => member.membershipStatus === statusFilter);
     }
-
-    return filtered;
+    return currentMembers;
   }, [members, searchFilter, statusFilter]);
 
   const handleEditClick = (member: Member) => {
@@ -89,36 +91,22 @@ export function MemberManagement({ onMemberSelect }: MemberManagementProps) {
 
   const handleDeleteClick = async (id: string, dni: string) => {
     if (window.confirm(`¿Estás seguro de eliminar el miembro con DNI ${dni}?`)) {
-      deleteMember(id);
+      deleteMember(id, {
+        onSuccess: () => {
+          showSnackbar(`Miembro con DNI ${dni} eliminado correctamente.`, 'success');
+          refetch();
+        },
+        onError: (error: Error) => {
+          showSnackbar(`Error al eliminar miembro: ${error.message}`, 'error');
+        },
+      });
     }
   };
 
-  const handleCreateMember = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>, isEditMode: boolean) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    
-    const memberData: CreateMemberData = {
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
-      dni: formData.get('dni') as string,
-      email: formData.get('email') as string || undefined,
-      phone: formData.get('phone') as string || undefined,
-      startDate: new Date().toISOString(),
-      renewalDate: formData.get('renewalDate') as string,
-      membershipStatus: formData.get('membershipStatus') as MembershipStatus,
-      membershipPlan: formData.get('membershipPlan') as MembershipPlan,
-    };
-
-    createMember(memberData);
-    setCreateDialogOpen(false);
-  };
-
-  const handleUpdateMember = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!editingMember) return;
-
-    const formData = new FormData(event.currentTarget);
-    const memberData: UpdateMemberData = {
+    const commonData = {
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       dni: formData.get('dni') as string,
@@ -126,72 +114,110 @@ export function MemberManagement({ onMemberSelect }: MemberManagementProps) {
       phone: formData.get('phone') as string || undefined,
       renewalDate: formData.get('renewalDate') as string,
       membershipStatus: formData.get('membershipStatus') as MembershipStatus,
-      membershipPlan: formData.get('membershipPlan') as MembershipPlan,
+      membershipPlanId: formData.get('membershipPlanId') as string,
     };
 
-    updateMember({ id: editingMember.id, data: memberData });
-    handleEditClose();
+    if (isEditMode && editingMember) {
+      const memberData: UpdateMemberData = commonData;
+      updateMember({ id: editingMember.id, data: memberData }, {
+        onSuccess: () => {
+          showSnackbar('Miembro actualizado exitosamente.', 'success');
+          handleEditClose();
+          refetch();
+        },
+        onError: (error: Error) => {
+          showSnackbar(`Error al actualizar miembro: ${error.message}`, 'error');
+        },
+      });
+    } else {
+      const memberData: CreateMemberData = {
+        ...commonData,
+        startDate: new Date().toISOString(), 
+      };
+      createMember(memberData, {
+        onSuccess: () => {
+          showSnackbar('Miembro creado exitosamente.', 'success');
+          setCreateDialogOpen(false);
+          refetch();
+        },
+        onError: (error: Error) => {
+          showSnackbar(`Error al crear miembro: ${error.message}`, 'error');
+        },
+      });
+    }
   };
-
+  
   const handleUpdateAllStatuses = () => {
     if (window.confirm('¿Actualizar todos los estados de membresía basados en fechas de renovación?')) {
-      updateStatuses();
+      updateStatuses(undefined, {
+        onSuccess: () => {
+          showSnackbar('Estados de membresía actualizados.', 'success');
+          refetch();
+        },
+        onError: (error: Error) => {
+          showSnackbar(`Error al actualizar estados: ${error.message}`, 'error');
+        },
+      });
     }
   };
 
-  const getStatusColor = (membershipStatus: MembershipStatus): 'success' | 'error' => {
-    return membershipStatus === 'active' ? 'success' : 'error';
+  const getStatusColor = (membershipStatus: MembershipStatus): 'success' | 'error' | 'warning' | 'default' => {
+    if (membershipStatus === 'active') return 'success';
+    if (membershipStatus === 'expired') return 'error';
+    if (membershipStatus === 'pending') return 'warning';
+    return 'default';
   };
 
-  const columns: GridColDef[] = useMemo(
+  const getPlanNameById = (planId: string): string => {
+    const plan = membershipPlans.find(p => p.id === planId);
+    return plan ? `${plan.name} (${plan.duration})` : 'N/A';
+  };
+
+  const columns: GridColDef<Member>[] = useMemo(
     () => [
-      { field: 'dni', headerName: 'DNI', width: 120, fontWeight: 'bold' },
-      { field: 'firstName', headerName: 'Nombre', width: 150 },
-      { field: 'lastName', headerName: 'Apellido', width: 150 },
-      { field: 'email', headerName: 'Email', width: 200 },
-      { field: 'phone', headerName: 'Teléfono', width: 140 },
+      { field: 'dni', headerName: 'DNI', width: 100, fontWeight: 'bold' },
+      { field: 'firstName', headerName: 'Nombre', width: 130 },
+      { field: 'lastName', headerName: 'Apellido', width: 130 },
+      { field: 'email', headerName: 'Email', width: 180 },
       {
         field: 'membershipStatus',
         headerName: 'Estado',
-        width: 120,
-        renderCell: (params) => (
+        width: 110,
+        renderCell: (params: GridRenderCellParams<Member, MembershipStatus>) => (
           <Chip
-            label={params.value}
-            color={getStatusColor(params.value)}
+            label={params.value ? params.value.charAt(0).toUpperCase() + params.value.slice(1) : ''}
+            color={getStatusColor(params.value as MembershipStatus)}
             size="small"
             variant="filled"
           />
         ),
       },
-      { field: 'membershipPlan', headerName: 'Plan', width: 120 },
+      { 
+        field: 'membershipPlanId',
+        headerName: 'Plan', 
+        width: 150,
+        valueGetter: (_value, row) => getPlanNameById(row.membershipPlanId || '')
+      },
       {
         field: 'renewalDate',
-        headerName: 'Fecha de Renovación',
-        width: 130,
-        valueFormatter: (value) => new Date(value).toLocaleDateString('es-ES'),
+        headerName: 'Renovación',
+        width: 120,
+        valueFormatter: (value: string) => new Date(value).toLocaleDateString('es-ES'),
       },
       {
         field: 'actions',
         headerName: 'Acciones',
-        width: 150,
+        width: 120,
         sortable: false,
-        renderCell: (params) => (
+        renderCell: (params: GridRenderCellParams<Member>) => (
           <Box>
             <Tooltip title="Editar">
-              <IconButton
-                onClick={() => handleEditClick(params.row)}
-                size="small"
-                color="primary"
-              >
+              <IconButton onClick={() => handleEditClick(params.row)} size="small" color="primary">
                 <EditIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Eliminar">
-              <IconButton
-                onClick={() => handleDeleteClick(params.row.id, params.row.dni)}
-                size="small"
-                color="error"
-              >
+              <IconButton onClick={() => handleDeleteClick(params.row.id, params.row.dni)} size="small" color="error" disabled={isDeleting}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
@@ -199,313 +225,161 @@ export function MemberManagement({ onMemberSelect }: MemberManagementProps) {
         ),
       },
     ],
-    []
+    [membershipPlans, refetch, isDeleting] 
   );
 
-  if (isLoading) {
+  const defaultMemberData = useMemo(() => {
+    const firstPlanId = membershipPlans[0]?.id;
+    return {
+      firstName: '',
+      lastName: '',
+      dni: '',
+      email: '',
+      phone: '',
+      renewalDate: new Date().toISOString().split('T')[0],
+      membershipStatus: 'active' as MembershipStatus,
+      membershipPlanId: firstPlanId || '',
+    };
+  }, [membershipPlans]);
+
+  const memberFormFields = (currentData: typeof defaultMemberData & {id?: string} ) => {
+    return (
+      <Grid container spacing={2} sx={{pt: 1}}>
+        <Grid item xs={12} sm={6}>
+          <TextField margin="dense" required fullWidth id="firstName" label="Nombre" name="firstName" defaultValue={currentData.firstName} autoFocus />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField margin="dense" required fullWidth id="lastName" label="Apellido" name="lastName" defaultValue={currentData.lastName} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField margin="dense" required fullWidth id="dni" label="DNI" name="dni" defaultValue={currentData.dni} InputProps={{ readOnly: !!currentData.id }} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField margin="dense" fullWidth id="email" label="Email" name="email" type="email" defaultValue={currentData.email} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField margin="dense" fullWidth id="phone" label="Teléfono" name="phone" defaultValue={currentData.phone} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField InputLabelProps={{ shrink: true }} margin="dense" required fullWidth id="renewalDate" label="Fecha de Renovación" name="renewalDate" type="date" defaultValue={currentData.renewalDate} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth margin="dense" required>
+            <InputLabel id="membershipPlanId-label">Plan de Membresía</InputLabel>
+            <Select labelId="membershipPlanId-label" id="membershipPlanId" name="membershipPlanId" defaultValue={currentData.membershipPlanId} label="Plan de Membresía" disabled={isLoadingPlans}>
+              {isLoadingPlans && <MenuItem value={currentData.membershipPlanId}><CircularProgress size={20} sx={{mr:1}}/>Cargando planes...</MenuItem>}
+              {!isLoadingPlans && membershipPlans.map((plan) => (
+                <MenuItem key={plan.id} value={plan.id}>
+                  {plan.name} ({plan.duration} - ${plan.price})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth margin="dense" required>
+            <InputLabel id="membershipStatus-label">Estado de Membresía</InputLabel>
+            <Select labelId="membershipStatus-label" id="membershipStatus" name="membershipStatus" defaultValue={currentData.membershipStatus} label="Estado de Membresía">
+              <MenuItem value="active">Activo</MenuItem>
+              <MenuItem value="expired">Expirado</MenuItem>
+              <MenuItem value="pending">Pendiente</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+    );
+  };
+  
+  if (isLoadingMembers || isLoadingPlans && !createDialogOpen && !editingMember) { // Don't show main loading if a dialog is open and plans are still loading for it
     return <LoadingAnimation />;
   }
 
-  if (isError) {
-    return (
-      <Paper sx={{ p: 3 }}>
-        <Typography color="error">Error al cargar los miembros</Typography>
-        <Button onClick={() => refetch()} startIcon={<RefreshIcon />} sx={{ mt: 2 }}>
-          Reintentar
-        </Button>
-      </Paper>
-    );
+  if (isErrorMembers) {
+    return (<Paper sx={{ p: 3 }}><Typography color="error">Error al cargar miembros.</Typography><Button onClick={() => refetch()} startIcon={<RefreshIcon />} sx={{ mt: 2 }}>Reintentar</Button></Paper>);
+  }
+   if (isErrorPlans) {
+    return (<Paper sx={{ p: 3 }}><Typography color="error">Error al cargar planes de membresía.</Typography><Button onClick={() => refetch()} startIcon={<RefreshIcon />} sx={{ mt: 2 }}>Reintentar Carga de Planes</Button></Paper>);
   }
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
+    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
+      <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+        <Typography variant="h5" gutterBottom component="div" sx={{ mb: 2 }}>
           Gestión de Miembros
         </Typography>
-        
-        {/* Filter and Actions Bar */}
-        <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              label="Buscar por DNI, nombre o apellido"
-              variant="outlined"
-              size="small"
-              value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Estado</InputLabel>
-              <Select
-                value={statusFilter}
-                label="Estado"
-                onChange={(e) => setStatusFilter(e.target.value as MembershipStatus | 'all')}
-              >
-                <MenuItem value="all">Todos</MenuItem>
-                <MenuItem value="active">Activo</MenuItem>
-                <MenuItem value="expired">Vencido</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={5}>
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => setCreateDialogOpen(true)}
-              >
-                Nuevo Miembro
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<RefreshIcon />}
-                onClick={handleUpdateAllStatuses}
-                disabled={isUpdatingStatuses}
-              >
-                Actualizar Estados
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<RefreshIcon />}
-                onClick={() => refetch()}
-              >
-                Recargar
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
 
-        {/* Members Stats */}
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            Total: {filteredMembers.length} | 
-            Activos: {filteredMembers.filter(m => m.membershipStatus === 'active').length} | 
-            Vencidos: {filteredMembers.filter(m => m.membershipStatus === 'expired').length}
-          </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexGrow: 1, minWidth: '200px'  }}>
+            <SearchIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
+            <TextField label="Buscar DNI, Nombre o Apellido" variant="outlined" size="small" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} sx={{ flexGrow: 1 }}/>
+          </Box>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Estado</InputLabel>
+            <Select value={statusFilter} label="Estado" onChange={(e) => setStatusFilter(e.target.value as MembershipStatus | 'all')}>
+              <MenuItem value="all">Todos</MenuItem>
+              <MenuItem value="active">Activo</MenuItem>
+              <MenuItem value="expired">Expirado</MenuItem>
+              <MenuItem value="pending">Pendiente</MenuItem>
+            </Select>
+          </FormControl>
+           <Button variant="outlined" startIcon={<RefreshIcon />} onClick={handleUpdateAllStatuses} disabled={isUpdatingStatuses} size="medium">
+            {isUpdatingStatuses ? 'Actualizando...' : 'Actualizar Estados'}
+          </Button>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateDialogOpen(true)} size="medium">
+            Registrar Miembro
+          </Button>
         </Box>
-      </Box>
 
-      {/* Members DataGrid */}
-      <Box sx={{ height: 600, width: '100%' }}>
-        <DataGrid
-          rows={filteredMembers}
-          columns={columns}
-          autoHeight
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
-          onRowClick={(params) => onMemberSelect && onMemberSelect(params.row)}
-          sx={{
-            '& .MuiDataGrid-row:hover': {
-              cursor: onMemberSelect ? 'pointer' : 'default',
-            },
-          }}
-        />
-      </Box>
+        <Box sx={{ height: 650, width: '100%' }}>
+          <DataGrid
+            rows={filteredMembers}
+            columns={columns}
+            pageSizeOptions={[10, 25, 50]}
+            initialState={{ pagination: { paginationModel: { pageSize: 10 }}}}
+            loading={isLoadingMembers || isUpdatingStatuses || isDeleting}
+            rowSelection={false}
+            onRowClick={(params) => onMemberSelect && onMemberSelect(params.row as Member)}
+            getRowId={(row) => row.id}
+          />
+        </Box>
+      </Paper>
 
-      {/* Create Member Dialog */}
-      <Dialog 
-        open={createDialogOpen} 
-        onClose={() => setCreateDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Crear Nuevo Miembro</DialogTitle>
-        <form onSubmit={handleCreateMember}>
+      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Registrar Nuevo Miembro</DialogTitle>
+        <Box component="form" id="create-member-form" onSubmit={(e) => handleFormSubmit(e, false)}>
           <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="firstName"
-                  label="Nombre"
-                  fullWidth
-                  required
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="lastName"
-                  label="Apellido"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="dni"
-                  label="DNI"
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="email"
-                  label="Email"
-                  type="email"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="phone"
-                  label="Teléfono"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="renewalDate"
-                  label="Fecha de Renovación"
-                  type="datetime-local"
-                  fullWidth
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Estado</InputLabel>
-                  <Select name="membershipStatus" required defaultValue="active">
-                    <MenuItem value="active">Activo</MenuItem>
-                    <MenuItem value="expired">Vencido</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Plan</InputLabel>
-                  <Select name="membershipPlan" required defaultValue="monthly">
-                    <MenuItem value="monthly">Mensual</MenuItem>
-                    <MenuItem value="custom">Personalizado</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
+            {memberFormFields(defaultMemberData)}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setCreateDialogOpen(false)}>
-              Cancelar
-            </Button>
+            <Button onClick={() => setCreateDialogOpen(false)}>Cancelar</Button>
             <Button type="submit" variant="contained" disabled={isCreating}>
-              {isCreating ? 'Creando...' : 'Crear'}
+              {isCreating ? 'Registrando...' : 'Registrar'}
             </Button>
           </DialogActions>
-        </form>
+        </Box>
       </Dialog>
 
-      {/* Edit Member Dialog */}
-      <Dialog 
-        open={!!editingMember} 
-        onClose={handleEditClose}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Editar Miembro</DialogTitle>
-        <form onSubmit={handleUpdateMember}>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="firstName"
-                  label="Nombre"
-                  fullWidth
-                  required
-                  defaultValue={editingMember?.firstName || ''}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="lastName"
-                  label="Apellido"
-                  fullWidth
-                  required
-                  defaultValue={editingMember?.lastName || ''}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="dni"
-                  label="DNI"
-                  fullWidth
-                  required
-                  defaultValue={editingMember?.dni || ''}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="email"
-                  label="Email"
-                  type="email"
-                  fullWidth
-                  defaultValue={editingMember?.email || ''}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="phone"
-                  label="Teléfono"
-                  fullWidth
-                  defaultValue={editingMember?.phone || ''}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="renewalDate"
-                  label="Fecha de Renovación"
-                  type="datetime-local"
-                  fullWidth
-                  required
-                  defaultValue={editingMember?.renewalDate?.split('.')[0] || ''}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Estado</InputLabel>
-                  <Select 
-                    name="membershipStatus" 
-                    required 
-                    defaultValue={editingMember?.membershipStatus || 'active'}
-                  >
-                    <MenuItem value="active">Activo</MenuItem>
-                    <MenuItem value="expired">Vencido</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Plan</InputLabel>
-                  <Select 
-                    name="membershipPlan" 
-                    required 
-                    defaultValue={editingMember?.membershipPlan || 'monthly'}
-                  >
-                    <MenuItem value="monthly">Mensual</MenuItem>
-                    <MenuItem value="custom">Personalizado</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleEditClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" variant="contained" disabled={isUpdating}>
-              {isUpdating ? 'Actualizando...' : 'Actualizar'}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </Paper>
+      {editingMember && (
+        <Dialog open={!!editingMember} onClose={handleEditClose} maxWidth="md" fullWidth>
+          <DialogTitle>Editar Miembro: {editingMember.firstName} {editingMember.lastName}</DialogTitle>
+          <Box component="form" id="edit-member-form" onSubmit={(e) => handleFormSubmit(e, true)}>
+            <DialogContent>
+              {memberFormFields({
+                ...editingMember,
+                email: editingMember.email || '', 
+                phone: editingMember.phone || '',
+                renewalDate: editingMember.renewalDate ? new Date(editingMember.renewalDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+              } as typeof defaultMemberData & { id?: string })}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleEditClose}>Cancelar</Button>
+              <Button type="submit" variant="contained" disabled={isUpdating}>
+                {isUpdating ? 'Guardando...' : 'Guardar Cambios'}
+              </Button>
+            </DialogActions>
+          </Box>
+        </Dialog>
+      )}
+    </Container>
   );
 }

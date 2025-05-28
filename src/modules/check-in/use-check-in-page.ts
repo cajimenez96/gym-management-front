@@ -2,7 +2,7 @@ import { SelectChangeEvent } from '@mui/material';
 import { useState } from 'react';
 import { useGetMembers } from '@/modules/member';
 import { useCreateCheckIn, useGetCheckIns } from '@/modules/check-in';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useCheckInPage = () => {
@@ -20,7 +20,7 @@ export const useCheckInPage = () => {
   } = useGetCheckIns();
   const { mutate: performCheckInMutation, isPending: isCheckInPending } =
     useCreateCheckIn();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   const isDataLoading = isCheckInsLoading || isMembersLoading;
   const isError = isMembersError || isCheckInsError;

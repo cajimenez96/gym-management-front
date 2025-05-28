@@ -136,7 +136,12 @@ La aplicación sigue una estructura de componentes modular:
 
 ## Gestión de Estado
 
-Esta aplicación utiliza una combinación de React Query para gestión de estado del servidor y estado local de React (via `useState`) para estado de UI.
+Esta aplicación utiliza una combinación de:
+- **React Query**: Para la gestión de estado del servidor (datos obtenidos de la API, cacheo, actualizaciones asíncronas).
+- **Zustand**: Para la gestión de estado global del cliente (ej. estado de autenticación, notificaciones de UI).
+- **Estado local de React (`useState`)**: Para estado de UI específico de componentes (ej. control de diálogos, entradas de formularios).
+
+Este enfoque ayuda a separar las preocupaciones del estado y a utilizar la herramienta adecuada para cada tipo de estado, mejorando la organización y el rendimiento.
 
 ## Estilos
 

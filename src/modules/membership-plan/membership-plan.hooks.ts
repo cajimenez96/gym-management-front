@@ -6,7 +6,7 @@ import {
   MembershipPlanService,
 } from '@/modules/membership-plan';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
 
 const membershipPlanRepository = new MembershipPlanRepository();
 const membershipPlanService = new MembershipPlanService(
@@ -22,7 +22,7 @@ export const useMembershipPlans = () => {
 
 export const useCreateMembershipPlan = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<MembershipPlan, Error, CreateMembershipPlanData>({
     mutationFn: (newPlan) =>
@@ -43,7 +43,7 @@ export const useCreateMembershipPlan = () => {
 
 export const useUpdateMembershipPlan = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<
     MembershipPlan,
@@ -68,7 +68,7 @@ export const useUpdateMembershipPlan = () => {
 
 export const useDeleteMembershipPlan = () => {
   const queryClient = useQueryClient();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
 
   return useMutation<void, Error, string>({
     mutationFn: (id) => membershipPlanService.deleteMembershipPlan(id),

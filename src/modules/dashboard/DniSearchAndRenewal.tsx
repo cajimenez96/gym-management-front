@@ -34,20 +34,20 @@ import {
 import {
   Member,
   MembershipStatus,
-  MembershipPlan,
   RenewMembershipData,
   useSearchMemberByDni,
   useRenewMembership,
   useGetMembers,
 } from '@/modules/member';
-import { useSnackbar } from '@/context';
+import { useNotificationStore } from '@/stores/notification.store';
+import { MembershipPlan as MembershipPlanType, useMembershipPlans } from '@/modules/membership-plan';
 
 export function DniSearchAndRenewal() {
   const [searchDni, setSearchDni] = useState('');
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [renewalDialogOpen, setRenewalDialogOpen] = useState(false);
   const [renewalDate, setRenewalDate] = useState('');
-  const [renewalPlan, setRenewalPlan] = useState<MembershipPlan>('monthly');
+  const [renewalPlanId, setRenewalPlanId] = useState<string>('');
 
   // Hooks
   const { data: allMembers = [] } = useGetMembers();
@@ -56,7 +56,8 @@ export function DniSearchAndRenewal() {
     searchDni.length >= 3
   );
   const { mutate: renewMembership, isPending: isRenewing } = useRenewMembership();
-  const { showSnackbar } = useSnackbar();
+  const showSnackbar = useNotificationStore((state) => state.showSnackbar);
+  const { data: membershipPlans = [] } = useMembershipPlans();
 
   // Update selected member when search results change
   useEffect(() => {
@@ -87,7 +88,7 @@ export function DniSearchAndRenewal() {
     const currentRenewal = new Date(selectedMember.renewalDate);
     currentRenewal.setMonth(currentRenewal.getMonth() + 1);
     setRenewalDate(currentRenewal.toISOString().split('.')[0]);
-    setRenewalPlan(selectedMember.membershipPlan);
+    setRenewalPlanId(selectedMember.membershipPlanId || '');
     setRenewalDialogOpen(true);
   };
 
@@ -100,7 +101,7 @@ export function DniSearchAndRenewal() {
     const renewData: RenewMembershipData = {
       dni: selectedMember.dni,
       renewalDate: currentRenewal.toISOString(),
-      membershipPlan: selectedMember.membershipPlan,
+      membershipPlanId: selectedMember.membershipPlanId,
     };
 
     renewMembership(renewData, {
@@ -118,7 +119,7 @@ export function DniSearchAndRenewal() {
     const renewData: RenewMembershipData = {
       dni: selectedMember.dni,
       renewalDate: renewalDate,
-      membershipPlan: renewalPlan,
+      membershipPlanId: renewalPlanId,
     };
 
     renewMembership(renewData, {
@@ -144,6 +145,12 @@ export function DniSearchAndRenewal() {
     const diffTime = renewal.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  const getPlanNameById = (planId: string | null | undefined): string => {
+    if (!planId) return 'N/A';
+    const plan = membershipPlans.find(p => p.id === planId);
+    return plan ? plan.name : 'N/A';
   };
 
   const getExpirationStatus = (renewalDate: string) => {
@@ -189,7 +196,7 @@ export function DniSearchAndRenewal() {
                       <strong>{option.dni}</strong> - {option.member.firstName} {option.member.lastName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {option.member.membershipPlan} | {option.member.membershipStatus}
+                      {getPlanNameById(option.member.membershipPlanId)} | {option.member.membershipStatus}
                     </Typography>
                   </Box>
                 </li>
@@ -239,7 +246,7 @@ export function DniSearchAndRenewal() {
                   <strong>Teléfono:</strong> {selectedMember.phone || 'No especificado'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  <strong>Plan:</strong> {selectedMember.membershipPlan}
+                  <strong>Plan:</strong> {getPlanNameById(selectedMember.membershipPlanId)}
                 </Typography>
               </Grid>
 
@@ -373,12 +380,15 @@ export function DniSearchAndRenewal() {
                 <FormControl fullWidth>
                   <InputLabel>Plan de Membresía</InputLabel>
                   <Select
-                    value={renewalPlan}
+                    value={renewalPlanId}
                     label="Plan de Membresía"
-                    onChange={(e) => setRenewalPlan(e.target.value as MembershipPlan)}
+                    onChange={(e) => setRenewalPlanId(e.target.value as string)}
                   >
-                    <MenuItem value="monthly">Mensual</MenuItem>
-                    <MenuItem value="custom">Personalizado</MenuItem>
+                    {membershipPlans.map((plan: MembershipPlanType) => (
+                       <MenuItem key={plan.id} value={plan.id}>
+                         {plan.name} ({plan.duration} - ${plan.price})
+                       </MenuItem>
+                     ))}
                   </Select>
                 </FormControl>
               </Grid>
