@@ -1,9 +1,9 @@
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
-import { useAuth } from 'src/context';
+import { useAuthStore } from '@/stores/auth.store';
 import { QueryClient } from '@tanstack/react-query';
 import React, { Suspense } from 'react';
 
-type AuthContextType = ReturnType<typeof useAuth>;
+type AuthContextType = ReturnType<typeof useAuthStore.getState>;
 
 export interface RouterContext {
   auth: AuthContextType;

@@ -26,7 +26,17 @@ export function MembershipPlansPage() {
   const [editingPlan, setEditingPlan] = useState<MembershipPlan | null>(null);
   const { data: plans = [], isLoading, isError } = useMembershipPlans();
   const deleteMutation = useDeleteMembershipPlan();
-  const tableRows = plans.slice().sort((a, b) => a?.duration - b?.duration);
+  const durationOrder: { [key: string]: number } = {
+    daily: 1,
+    weekly: 7,
+    monthly: 30,
+  };
+
+  const tableRows = plans.slice().sort((a, b) => {
+    const durationA = a?.duration ? durationOrder[a.duration] || 0 : 0;
+    const durationB = b?.duration ? durationOrder[b.duration] || 0 : 0;
+    return durationA - durationB;
+  });
 
   const handleOpenDialog = (plan: MembershipPlan | null = null) => {
     setEditingPlan(plan);

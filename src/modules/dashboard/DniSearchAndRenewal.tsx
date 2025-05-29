@@ -11,13 +11,11 @@ import {
   DialogTitle,
   FormControl,
   Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   TextField,
-  Tooltip,
   Typography,
   Alert,
   Autocomplete,
@@ -25,7 +23,6 @@ import {
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  Refresh as RefreshIcon,
   CalendarToday as CalendarIcon,
   Person as PersonIcon,
   Payment as PaymentIcon,
@@ -33,7 +30,6 @@ import {
 } from '@mui/icons-material';
 import {
   Member,
-  MembershipStatus,
   RenewMembershipData,
   useSearchMemberByDni,
   useRenewMembership,
@@ -174,7 +170,7 @@ export function DniSearchAndRenewal() {
               options={dniOptions}
               getOptionLabel={(option) => option.label}
               value={dniOptions.find(opt => opt.dni === searchDni) || null}
-              onChange={(event, newValue) => handleDniSelect(newValue)}
+              onChange={(_, newValue) => handleDniSelect(newValue)}
               loading={isSearching}
               renderInput={(params) => (
                 <TextField

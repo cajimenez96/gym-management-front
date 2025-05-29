@@ -3,7 +3,6 @@ import {
   CreateMemberData, 
   Member, 
   UpdateMemberData,
-  SearchMemberByDniData,
   RenewMembershipData,
   MemberCheckInInfoDto
 } from '@/modules/member';

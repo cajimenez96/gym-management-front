@@ -18,7 +18,7 @@ import {
 import { useCheckInPage } from './use-check-in-page.ts';
 import { LoadingAnimation } from '@/components';
 import { CheckIn } from '@/modules/check-in';
-import { Member, useGetMemberCheckInInfoByDni, MemberCheckInInfoDto } from '@/modules/member';
+import { useGetMemberCheckInInfoByDni, MemberCheckInInfoDto } from '@/modules/member';
 import { format, parseISO } from 'date-fns';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useNotificationStore } from '@/stores/notification.store';
@@ -106,7 +106,6 @@ export function CheckInPage() {
     data: memberInfo,
     isLoading: isLoadingInfo,
     error: errorInfo,
-    refetch: refetchMemberInfo,
   } = useGetMemberCheckInInfoByDni(dniToSearch, {
     enabled: !!dniToSearch && isInfoPopupOpen,
   });

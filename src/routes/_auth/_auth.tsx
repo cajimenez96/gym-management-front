@@ -45,7 +45,7 @@ export const Route = createFileRoute('/_auth/_auth')({
   beforeLoad: async ({ location }) => {
     await awaitAuthInitialization();
 
-    const { isAuthenticated, user } = useAuthStore.getState();
+    const { isAuthenticated } = useAuthStore.getState();
 
     if (!isAuthenticated) {
       throw redirect({

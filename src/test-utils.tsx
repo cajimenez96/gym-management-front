@@ -1,7 +1,6 @@
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RenderOptions, render } from '@testing-library/react';
-import { AuthProvider, SnackbarProvider } from '@/context';
 import React from 'react';
 
 export const MEMBERS_MATCHER = '*/members';
@@ -21,16 +20,12 @@ const AllTheProviders: React.FC<{ children: React.ReactNode }> = ({
   });
 
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <SnackbarProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-          </ThemeProvider>
-        </SnackbarProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

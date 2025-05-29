@@ -1,10 +1,10 @@
 import {
   CreateMemberData,
   Member,
-  MemberStatus,
   UpdateMemberData,
   MemberRepository,
   MemberCheckInInfoDto,
+  MembershipStatus
 } from '@/modules/member';
 
 export class MemberService {
@@ -43,20 +43,20 @@ export class MemberService {
     }
   }
 
-  async getMembershipStatus(memberId: string): Promise<MemberStatus> {
+  async getMembershipStatus(memberId: string): Promise<MembershipStatus> {
     const member = await this.memberRepository.getById(memberId);
     if (!member) {
       throw new Error('Member not found');
     }
-    return member.status;
+    return member.membershipStatus;
   }
 
   async updateMembershipStatus(
     memberId: string,
-    status: MemberStatus,
+    status: MembershipStatus,
   ): Promise<boolean> {
     try {
-      await this.memberRepository.update(memberId, { status });
+      await this.memberRepository.update(memberId, { membershipStatus: status });
       return true;
     } catch (error) {
       console.error('Error updating member status:', error);

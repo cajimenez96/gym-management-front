@@ -80,7 +80,6 @@ const MenuItem: React.FC<MenuItemProps> = ({
   text,
   icon: Icon,
   path,
-  roles, // Include roles but we don't need to use it in the component
   isSelected,
   onClick,
 }) => (
@@ -133,14 +132,11 @@ function DrawerContent({ onItemClick }: { onItemClick?: () => void }) {
       </Box>
       <Divider />
       <List>
-        {filteredMenuItems.map(({ text, icon, path, roles }) => (
+        {filteredMenuItems.map((item) => (
           <MenuItem
-            key={text}
-            text={text}
-            icon={icon}
-            path={path}
-            roles={roles}
-            isSelected={isSelectedRoute(path)}
+            key={item.text}
+            {...item}
+            isSelected={isSelectedRoute(item.path)}
             onClick={onItemClick}
           />
         ))}

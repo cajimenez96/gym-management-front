@@ -3,7 +3,7 @@ import { OwnerDashboard } from '@/modules/dashboard';
 import { useRoleAccess } from '@/modules/auth';
 
 export const Route = createFileRoute('/_auth/_auth/dashboard/owner')({
-  beforeLoad: ({ context }) => {
+  beforeLoad: () => {
     // Verify user is authenticated (handled by _auth layout)
     // Additional role verification will be done in component
   },

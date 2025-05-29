@@ -4,7 +4,6 @@ import {
   CreateMemberData,
   Member,
   UpdateMemberData,
-  SearchMemberByDniData,
   RenewMembershipData,
   MemberRepository,
   MemberService,

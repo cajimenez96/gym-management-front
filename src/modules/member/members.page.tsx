@@ -19,7 +19,7 @@ import {
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {
   Member,
-  MemberStatus,
+  MembershipStatus,
   UpdateMemberData,
   useDeleteMember,
   useGetMembers,
@@ -60,7 +60,7 @@ export function MembersPage() {
       lastName: formData.get('lastName') as string,
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
-      status: formData.get('status') as MemberStatus,
+      membershipStatus: formData.get('status') as MembershipStatus,
       membershipPlanId: formData.get('membershipPlanId') as string | null,
     };
     updateMember({ id: editingMember.id, data: memberData });
@@ -69,34 +69,34 @@ export function MembersPage() {
 
   const columns: GridColDef[] = useMemo(
     () => [
-      { field: 'id', headerName: 'ID', width: 70 },
+      { field: 'dni', headerName: 'DNI', width: 150 },
       {
         field: 'firstName',
         headerName: 'First Name',
-        width: 130,
+        width: 200,
       },
       {
         field: 'lastName',
         headerName: 'Last Name',
-        width: 180,
+        width: 200,
       },
-      { field: 'email', headerName: 'Email', width: 200 },
-      { field: 'phone', headerName: 'Phone', width: 150 },
+      // { field: 'email', headerName: 'Email', width: 200 },
+      // { field: 'phone', headerName: 'Phone', width: 150 },
       {
         field: 'membershipPlanId',
         headerName: 'Plan',
-        width: 150,
+        width: 200,
         valueFormatter: (value: string | null) => {
           if (!value) return 'Sin plan';
           const plan = membershipPlans.find(p => p.id === value);
           return plan ? plan.name : 'Plan no encontrado';
         },
       },
-      { field: 'status', headerName: 'Status', width: 120 },
+      { field: 'status', headerName: 'Status', width: 200 },
       {
         field: 'actions',
         headerName: 'Actions',
-        width: 120,
+        width: 200,
         sortable: false,
         renderCell: (params) => (
           <>
@@ -199,13 +199,12 @@ export function MembersPage() {
               <Select
                 labelId="status-label"
                 name="status"
-                defaultValue={editingMember?.status || 'Active'}
+                defaultValue={editingMember?.membershipStatus || 'active'}
                 label="Status"
                 variant="outlined"
               >
-                <MenuItem value="Active">Active</MenuItem>
-                <MenuItem value="Inactive">Inactive</MenuItem>
-                <MenuItem value="Suspended">Suspended</MenuItem>
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="expired">Expired</MenuItem>
               </Select>
             </FormControl>
           </DialogContent>

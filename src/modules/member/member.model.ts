@@ -16,7 +16,6 @@ export interface Member {
   membershipPlanId?: string | null; // Cambiado de membershipPlan: MembershipPlan
   // Opcionalmente, si el backend devuelve el objeto plan completo:
   // membershipPlan?: { id: string; name: string; duration: string; price: number } | null;
-  status: MemberStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -24,12 +23,11 @@ export interface Member {
 // CreateMemberData debe incluir todos los campos necesarios para la creación, incluyendo el ID del plan
 export type CreateMemberData = Omit<
   Member,
-  'id' | 'createdAt' | 'updatedAt' | 'status' // status podría ser calculado o default
+  'id' | 'createdAt' | 'updatedAt' // status podría ser calculado o default
 >; // membershipPlanId ya es opcional en Member, así que está bien aquí
 
 export type UpdateMemberData = Partial<Omit<CreateMemberData, 'dni'>> & {
   dni?: string; // DNI no suele ser parte del Partial principal para update, se maneja con cuidado
-  status?: MemberStatus;
   membershipPlanId?: string | null; // Asegurar que se pueda actualizar
 };
 

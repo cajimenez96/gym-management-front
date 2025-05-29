@@ -26,6 +26,7 @@ const placeholderAuthContext = {
   clearError: () => { console.warn('Router context clearError called'); },
   // Add any other functions/properties that were on the original AuthContextType
   // if the linter still complains about missing properties on `auth`.
+  initializeAuth: useAuthStore.getState().initializeAuth,
 };
 
 // The context type will be inferred by TanStack Router based on the provided context object.

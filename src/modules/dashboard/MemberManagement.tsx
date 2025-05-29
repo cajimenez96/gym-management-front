@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -40,7 +40,6 @@ import {
   useUpdateMemberStatuses,
 } from '@/modules/member';
 import {
-  MembershipPlan as MembershipPlanType, // Renamed for clarity
   useMembershipPlans,
 } from '@/modules/membership-plan';
 import { LoadingAnimation } from '@/components';
